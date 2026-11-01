@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Know My Health: touch a body map, tell your story, and get a clinician-ready record to bring to your doctor. Records only; never diagnoses.">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+</style>
+<title>Know My Health</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: black brand band on top, then two voices side by side. Left = the body (touch), right = the story (voice) which resolves into a chart (data).
+   Brand: Teresa Younkin black / white / gold. Montserrat uppercase heads, Source Sans 3 body, square corners, gold accents. Single light theme. */
+:root{
+  color-scheme:light;
+  --bg:#FAF9F7; --panel:#FFFFFF; --ink:#1A1A1A; --muted:#5A5A5A; --line:#E2E0DC;
+  --accent:#111111; --accent-soft:#EDEDEA; --skin:#E9E6E0; --skin-hover:#D9D3C7;
+  --gold:#D8AC54; --gold-deep:#8A6A1E; --night:#000000; --cream:#F5F5F2;
+  --chart:#FAF9F7; --chart-rule:#ECE9E3; --ok:#1F7A4D; --warn:#8A5A00; --crit:#B3122E;
+  --warn-soft:#FBF1DC; --crit-soft:#FBE6E8;
+  --f-display:"Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Source Sans 3", system-ui, sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2rem,4.5vw,3.1rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.15rem;font-weight:700}
+.eyebrow{font-family:var(--f-data);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header.hero{display:grid;gap:10px;margin-bottom:22px}
+.thesis{font-size:clamp(1.05rem,2vw,1.3rem);margin:0;max-width:60ch}
+.thesis .story{font-style:italic}
+.thesis .data{font-family:var(--f-data);font-size:.9em;background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:4px}
+.lede{color:var(--muted);margin:0;max-width:68ch}
+
+.work{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.work{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px;min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.step{font-family:var(--f-data);font-size:.75rem;color:var(--accent)}
+.col{display:grid;gap:20px;min-width:0}
+
+/* body map */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:.85rem;padding:4px 12px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.mapbox{position:relative;background:var(--chart);border-radius:10px;border:1px solid var(--line);
+  background-image:linear-gradient(var(--chart-rule) 1px,transparent 1px),linear-gradient(90deg,var(--chart-rule) 1px,transparent 1px);background-size:20px 20px}
+.mapbox svg{display:block;width:100%;max-width:300px;height:auto;margin:0 auto}
+.side-tag{position:absolute;top:8px;font-family:var(--f-data);font-size:.68rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.side-tag.l{left:10px}.side-tag.r{right:10px}
+.region{fill:var(--skin);stroke:var(--line);stroke-width:1;cursor:pointer;transition:fill .15s}
+.region:hover{fill:var(--skin-hover)}
+.region:focus{outline:none}
+.region:focus-visible{stroke:var(--accent);stroke-width:2.5}
+.region.active{stroke:var(--ink);stroke-width:2.5}
+.hint{font-size:.85rem;color:var(--muted);margin:0}
+.region{stroke-width:.6;stroke-linejoin:round}
+#detail .region{stroke-width:1.2}
+.region.joint{fill:var(--panel);stroke:var(--muted);stroke-width:1.2}
+.region.joint:hover{fill:var(--skin-hover)}
+.region.active,#detail .region.active{stroke:var(--ink);stroke-width:2}
+#body .region.active{stroke-width:1.4}
+.deco{fill:none;stroke:var(--line);stroke-width:.7;pointer-events:none}
+.deco.solid{fill:var(--skin)}
+.crease{fill:none;stroke:var(--muted);stroke-width:.8;opacity:.45;pointer-events:none}
+.detail{display:grid;gap:10px}
+.zoom{flex-wrap:wrap;border-radius:12px;justify-self:start}
+.zoom button{font-size:.8rem;padding:4px 10px}
+.mapbox svg#body{max-width:250px}
+.mapbox svg#detail{max-width:260px;padding-top:8px}
+.detail-cap{margin:0;padding:0 12px 10px;text-align:center;font-size:.8rem;color:var(--muted)}
+
+.editor{border-top:1px dashed var(--line);padding-top:14px;display:grid;gap:12px}
+.editor[hidden]{display:none}
+.editor h3{font-size:1rem}
+.sev-row{display:flex;align-items:center;gap:12px}
+.sev-row input{flex:1;accent-color:var(--accent)}
+.sev-num{font-family:var(--f-data);font-size:1.1rem;min-width:3.2ch;text-align:right;font-variant-numeric:tabular-nums}
+.sev-scale{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:-6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:.84rem;padding:4px 10px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.chip:focus-visible,.btn:focus-visible,.seg button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.linkish{background:none;border:0;color:var(--crit);font:inherit;font-size:.85rem;cursor:pointer;padding:0;justify-self:start;text-decoration:underline}
+.sites{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.sites li{display:flex;align-items:center;gap:10px;font-size:.88rem;cursor:pointer;padding:4px 6px;border-radius:6px}
+.sites li:hover{background:var(--accent-soft)}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}
+.sites .q{color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sites .n{font-family:var(--f-data);font-variant-numeric:tabular-nums}
+
+/* story */
+textarea{width:100%;box-sizing:border-box;min-height:170px;resize:vertical;font:inherit;font-size:1.02rem;line-height:1.6;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:.92rem;border-radius:9px;padding:9px 16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--panel);font-weight:700}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.rec{border-color:var(--crit);color:var(--crit)}
+.btn .pulse{width:9px;height:9px;border-radius:50%;background:currentColor}
+.btn.rec .pulse{animation:pulse 1.1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.btn.rec .pulse{animation:none}}
+.note{font-size:.85rem;color:var(--muted);margin:0}
+.note.alert{color:var(--warn)}
+.record{border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:.88rem}
+.record summary{cursor:pointer;display:flex;gap:10px;align-items:center;list-style:none}
+.record summary::-webkit-details-marker{display:none}
+.record dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:10px 0 2px}
+.record dt{color:var(--muted)}.record dd{margin:0}
+.toggle{display:flex;gap:8px;align-items:center;font-size:.9rem}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+
+/* results */
+.status{font-family:var(--f-data);font-size:.82rem;color:var(--muted)}
+.badge{font-family:var(--f-data);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;background:var(--warn-soft);color:var(--warn)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tab{border:0;background:none;font:inherit;font-size:.9rem;color:var(--muted);padding:8px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:700}
+.tab .cnt{font-family:var(--f-data);font-size:.72rem;color:var(--accent);margin-left:4px}
+.pane{min-width:0}
+.voice{font-size:1.08rem;max-width:64ch;margin:0}
+.chart{font-family:var(--f-data);font-size:.86rem;line-height:1.7;background:var(--chart);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+  background-image:repeating-linear-gradient(transparent 0 calc(1.7em - 1px),var(--chart-rule) calc(1.7em - 1px) 1.7em);background-position:0 16px}
+.chart .cc{font-weight:500}
+.opq{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:14px 0 0}
+.opq dt{color:var(--accent);font-weight:500}
+.opq dd{margin:0}
+.xlate{width:100%;border-collapse:collapse;font-size:.92rem}
+.xlate th{text-align:left;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400;padding:6px 8px;border-bottom:1px solid var(--line)}
+.xlate td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.xlate td:first-child{font-style:italic;width:48%}
+.xlate td:last-child{font-family:var(--f-data);font-size:.84rem}
+.xlate td.arrow{color:var(--muted);width:1%;font-style:normal}
+.list{margin:0;padding-left:1.2em;display:grid;gap:8px;max-width:66ch}
+.flags{display:grid;gap:10px}
+.flag{border-radius:10px;padding:12px 14px;display:grid;gap:4px;border:1px solid var(--line)}
+.flag.emergency{background:var(--crit-soft);border-color:transparent}
+.flag.soon{background:var(--warn-soft);border-color:transparent}
+.flag .lvl{font-family:var(--f-data);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase}
+.flag.emergency .lvl{color:var(--crit)}.flag.soon .lvl{color:var(--warn)}.flag.routine .lvl{color:var(--ok)}
+.flag p{margin:0;font-size:.9rem;color:var(--muted)}
+.code{font-family:var(--f-data);font-size:.76rem;line-height:1.5;background:var(--chart);border:1px solid var(--line);border-radius:10px;padding:14px;max-height:380px;overflow:auto;white-space:pre;margin:0}
+.sub{font-family:var(--f-display);font-size:.95rem;margin:18px 0 8px}
+.handoff{display:grid;gap:12px}
+.fups{display:grid;gap:12px;margin-top:12px;max-width:68ch}
+.fup{display:grid;gap:6px}
+.fup label{font-size:.95rem}
+.fup input{font:inherit;font-size:.92rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;box-sizing:border-box}
+.fup input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.log{list-style:none;margin:6px 0 10px;padding:0;display:grid;gap:10px}
+.log li{border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:grid;gap:6px}
+.log .when{font-family:var(--f-data);font-size:.75rem;color:var(--muted)}
+.log-sites{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem}
+.log-site{display:inline-flex;align-items:center;gap:6px}
+.apps{display:flex;gap:10px;flex-wrap:wrap}
+footer{margin-top:28px;font-size:.82rem;color:var(--muted);display:grid;gap:6px;max-width:80ch}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- Brand layer ---------- */
+body{font-size:17px;line-height:1.6}
+.wrap{padding-block:36px 56px}
+header.hero{background:var(--night);color:var(--cream);border-bottom:5px solid var(--gold);margin:0}
+.hero-in{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:44px 40px;display:grid;gap:14px}
+header.hero .eyebrow{color:var(--gold);font-family:var(--f-display);font-weight:700;letter-spacing:.16em}
+header.hero h1{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(2.3rem,6vw,4.2rem);line-height:1}
+header.hero h1 span{color:var(--gold)}
+header.hero .bar{display:block;width:72px;height:5px;background:var(--gold)}
+header.hero .thesis{color:var(--cream);font-size:clamp(1.1rem,2vw,1.35rem)}
+header.hero .thesis .data{background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:0}
+header.hero .lede{color:#CFCFCF;max-width:72ch}
+h2{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-spacing:.01em;font-size:1.05rem}
+.editor h3{font-family:var(--f-display);font-weight:700}
+.step{font-family:var(--f-display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);font-size:.72rem}
+.eyebrow{font-family:var(--f-display);font-weight:600}
+.panel{border-radius:0;border-color:var(--line);border-top:3px solid var(--night)}
+.mapbox,textarea,.record,.chart,.code,.flag,.log li,.fup input,.who input,.who select{border-radius:0}
+.btn{border-radius:0;font-family:var(--f-display);font-weight:700;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 18px;border-width:2px;border-color:var(--ink);background:transparent;color:var(--ink)}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--night)}
+.btn.primary:hover{background:#E6C06A;border-color:#E6C06A}
+.btn.rec{border-color:var(--crit);color:var(--crit)}
+.seg{border-radius:0;border-color:var(--ink)}
+.seg button{border-radius:0;font-family:var(--f-display);font-weight:600;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}
+.seg button[aria-pressed="true"]{background:var(--night);color:var(--gold)}
+.chip{border-radius:0}
+.chip[aria-pressed="true"]{background:var(--night);border-color:var(--night);color:var(--gold)}
+.tab{font-family:var(--f-display);font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.tab[aria-selected="true"]{border-bottom-color:var(--gold);border-bottom-width:3px}
+.tab .cnt{color:var(--gold-deep)}
+.badge{border-radius:0;font-family:var(--f-display);font-weight:700}
+.sub{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.06em;font-size:.85rem}
+.opq dt{color:var(--gold-deep)}
+.sev-row input,.toggle input{accent-color:var(--night)}
+.linkish{color:var(--ink)}
+.chip:focus-visible,.btn:focus-visible,.seg button:focus-visible,.tab:focus-visible,.who input:focus,.who select:focus,textarea:focus{outline:3px solid var(--gold);outline-offset:2px}
+.region:focus-visible{stroke:var(--gold-deep)}
+.who{border:1px solid var(--line);margin:0;padding:14px 16px 12px;display:grid;gap:10px;background:var(--bg)}
+.who legend{font-family:var(--f-display);font-weight:700;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;padding:0 6px}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.fld{display:grid;gap:5px;font-size:.88rem;min-width:0}
+.fld span{font-weight:600}
+.who input,.who select{font:inherit;font-size:.95rem;color:var(--ink);background:var(--panel);border:1px solid #CFCAC1;padding:9px 10px;width:100%;box-sizing:border-box;min-width:0}
+footer{border-top:1px solid var(--line);padding-top:16px}
+.region{stroke:#B9B1A2}
+.region.joint{stroke:#6E675B}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-in">
+    <span class="eyebrow">Interactive demo · Mosaic Life Tech</span>
+    <h1>Know My <span>Health</span></h1>
+    <span class="bar" aria-hidden="true"></span>
+    <p class="thesis"><span class="story">Patients tell stories.</span> Doctors want <span class="data">data</span>. This page translates between the two.</p>
+    <p class="lede">Touch the body to show where it hurts, then tell what happened in your own words. You get your story back in plain language, a clinician-ready history, the follow-up questions your doctor is likely to ask, a log for episodes between visits, and a FHIR record you can carry anywhere. It records; it never diagnoses or recommends treatment.</p>
+  </div>
+</header>
+<div class="wrap">
+
+  <div class="work">
+    <!-- BODY -->
+    <section class="panel" aria-labelledby="h-body">
+      <div class="panel-head">
+        <div><div class="step">1 · Touch</div><h2 id="h-body">Show me where</h2></div>
+        <div class="seg" role="group" aria-label="Body view">
+          <button type="button" id="v-front" aria-pressed="true">Front</button>
+          <button type="button" id="v-back" aria-pressed="false">Back</button>
+        </div>
+      </div>
+      <div class="mapbox">
+        <span class="side-tag l" id="tag-l">Your right</span>
+        <span class="side-tag r" id="tag-r">Your left</span>
+        <svg id="body" viewBox="34 2 132 414" role="group" aria-label="Body map. Select an area to mark pain."></svg>
+      </div>
+      <p class="hint" id="map-hint">Tap an area to mark it, tap again to clear it. Tap a hand or foot to zoom in on fingers, toes, and joints. To edit a marked area, pick it from the list below.</p>
+
+      <div class="detail">
+        <div class="seg zoom" role="group" aria-label="Zoom in on hands and feet">
+          <button type="button" data-zoom="hand-R" aria-pressed="false">R hand</button>
+          <button type="button" data-zoom="hand-L" aria-pressed="false">L hand</button>
+          <button type="button" data-zoom="foot-R" aria-pressed="false">R foot</button>
+          <button type="button" data-zoom="foot-L" aria-pressed="false">L foot</button>
+        </div>
+        <div class="mapbox" id="detail-box" hidden>
+          <svg id="detail" viewBox="0 0 170 212" role="group" aria-label="Close-up. Select a finger, toe, or joint."></svg>
+          <p class="detail-cap" id="detail-cap"></p>
+        </div>
+      </div>
+
+      <div class="editor" id="editor" hidden>
+        <h3 id="ed-title">Area</h3>
+        <div>
+          <label for="ed-sev" class="eyebrow">How bad, 0 to 10</label>
+          <div class="sev-row"><input type="range" id="ed-sev" min="0" max="10" step="1" value="5"><span class="sev-num" id="ed-sevn">5</span></div>
+          <div class="sev-scale"><span>No pain</span><span>Worst imaginable</span></div>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:6px">What it feels like</div>
+          <div class="chips" id="ed-q"></div>
+        </div>
+        <p class="note">Tap the area again on the body to clear it.</p>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">Marked areas</div>
+        <ul class="sites" id="sites"></ul>
+      </div>
+    </section>
+
+    <div class="col">
+      <!-- STORY -->
+      <section class="panel" aria-labelledby="h-story">
+        <div class="panel-head">
+          <div><div class="step">2 · Tell</div><h2 id="h-story">Tell me what's going on</h2></div>
+          <div class="row">
+            <button type="button" class="btn" id="b-mic"><span class="pulse"></span><span id="mic-label">Speak</span></button>
+            <button type="button" class="btn" id="b-clear">Start fresh</button>
+          </div>
+        </div>
+        <label for="story" class="sr">Your story</label>
+        <textarea id="story" placeholder="When did it start? What were you doing? What makes it better or worse? What worries you?"></textarea>
+        <p class="note" id="mic-note">Talk the way you would to a friend. Details like "worse in the car" or "like a toothache" are exactly what helps.</p>
+
+        <details class="record" id="record">
+          <summary>
+            <label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" id="use-record" checked> Include sample health record</label>
+            <span class="note">(fictional patient · view)</span>
+          </summary>
+          <dl>
+            <dt>Patient</dt><dd>Maria Alvarez (fictional), 58, female</dd>
+            <dt>Conditions</dt><dd>Hypertension; type 2 diabetes; high cholesterol</dd>
+            <dt>Medications</dt><dd>Lisinopril 20 mg daily; metformin 1000 mg twice daily; atorvastatin 40 mg nightly</dd>
+            <dt>Allergies</dt><dd>Sulfa drugs (rash)</dd>
+            <dt>Recent labs</dt><dd>A1c 7.4% (Aug 2026); eGFR 68 (Aug 2026)</dd>
+          </dl>
+          <p class="note">Stands in for the records a patient can connect in a consumer AI app. Turn it off to see the translation from the story alone.</p>
+        </details>
+
+        <div class="row">
+          <button type="button" class="btn primary" id="b-go">Translate my story</button>
+          <button type="button" class="btn" id="b-stop" hidden>Stop</button>
+          <span class="status" id="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <!-- RESULT -->
+      <section class="panel" aria-labelledby="h-out" id="out">
+        <div class="panel-head">
+          <div><div class="step">3 · Translate</div><h2 id="h-out">Your story, in two languages</h2></div>
+          <span class="badge" id="ex-badge">Example output</span>
+        </div>
+        <div class="tabs" role="tablist" id="tabs"></div>
+        <div class="pane" id="pane" role="tabpanel"></div>
+      </section>
+
+      <!-- HANDOFF -->
+      <section class="panel handoff" aria-labelledby="h-hand">
+        <div><div class="step">4 · Carry it forward</div><h2 id="h-hand">Take it to your doctor</h2></div>
+        <p class="note">Download a one-to-two page summary to print or show on your phone: body maps with your marks, your story in your own words, the clinical history, the questions your doctor may ask (with space to write answers), and any episodes you logged. A caregiver can bring it on your behalf.</p>
+        <fieldset class="who">
+          <legend>About this summary</legend>
+          <div class="who-grid">
+            <label class="fld"><span>Patient name</span><input type="text" id="pt-name" autocomplete="name" placeholder="First and last name"></label>
+            <label class="fld"><span>Date of birth</span><input type="date" id="pt-dob"></label>
+            <label class="fld"><span>Completed by</span>
+              <select id="by-role">
+                <option value="patient">The patient</option>
+                <option value="caregiver">Caregiver</option>
+                <option value="family">Family member</option>
+                <option value="guardian">Parent or guardian</option>
+                <option value="other">Other</option>
+              </select></label>
+            <label class="fld" id="by-name-wrap" hidden><span>Their name</span><input type="text" id="by-name" placeholder="Name of person completing this"></label>
+          </div>
+          <p class="note">Printed at the top of the summary and included in the FHIR record. Kept only in this browser.</p>
+        </fieldset>
+        <div class="apps">
+          <button type="button" class="btn primary" id="b-pdf">Download summary (PDF)</button>
+          <button type="button" class="btn" id="b-copy">Copy summary text</button>
+        </div>
+        <div class="sub">Continue with your own records</div>
+        <p class="note">If you've connected your health records in a consumer AI app, take this record there to add your history and current medications. The prompt asks the app not to diagnose or suggest treatment. ChatGPT and Claude open with it prefilled; for Gemini, it's copied so you can paste it.</p>
+        <div class="apps">
+          <a class="btn" id="go-chatgpt" target="_blank" rel="noopener" href="https://chatgpt.com/">Open in ChatGPT</a>
+          <a class="btn" id="go-claude" target="_blank" rel="noopener" href="https://claude.ai/new">Open in Claude</a>
+          <a class="btn" id="go-gemini" target="_blank" rel="noopener" href="https://gemini.google.com/app">Open in Gemini</a>
+        </div>
+        <p class="status" id="copy-status" aria-live="polite"></p>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <span>A demonstration that records what you report. It does not diagnose, give medical advice, or recommend treatment. If you think you're having an emergency, call 911 or your local emergency number.</span>
+    <span>Nothing is stored. Your story goes to Claude only when you press Translate, using your own Claude account. SNOMED CT and LOINC codes are illustrative and should be validated before clinical use.</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+
+/* ---------- Anatomy ----------
+   Main figure: shapes are drawn for the viewer's LEFT half and mirrored for the right.
+   Front view: viewer-left = patient's RIGHT. Back view: viewer-left = patient's LEFT.
+   Hands and feet share region ids across the main figure and the close-up, so a mark shows in both. */
+const LAT = { R:{code:"24028007",display:"Right"}, L:{code:"7771000",display:"Left"} };
+const REGIONS = {};
+function reg(id, label, sct, side, extra){ REGIONS[id] = Object.assign({id,label,sct,side},extra||{}); return REGIONS[id]; }
+const SIDEW = s => s==="R" ? "Right" : "Left";
+
+/* Hands and feet: fingers, toes and their joints */
+const FINGERS = [
+  {k:"thumb", name:"thumb", sct:"76505004", joints:[["CMC","base-of-thumb joint (CMC)"],["MCP","base knuckle (MCP)"],["IP","knuckle (IP)"]]},
+  {k:"index", name:"index finger", sct:"83738005"},
+  {k:"middle", name:"middle finger", sct:"65531009"},
+  {k:"ring", name:"ring finger", sct:"82002001"},
+  {k:"little", name:"little finger", sct:"12406000"},
+];
+const FJ = [["MCP","base knuckle (MCP)"],["PIP","middle knuckle (PIP)"],["DIP","end knuckle (DIP)"]];
+const TOES = [
+  {k:"toe1", name:"big toe", sct:"78883009", joints:[["MTP","base joint (MTP)"],["IP","middle joint (IP)"]]},
+  {k:"toe2", name:"second toe", sct:"29707007"},
+  {k:"toe3", name:"third toe", sct:"29707007"},
+  {k:"toe4", name:"fourth toe", sct:"29707007"},
+  {k:"toe5", name:"little toe", sct:"29707007"},
+];
+const TJ = [["MTP","base joint (MTP)"],["PIP","middle joint (PIP)"]];
+["R","L"].forEach(s => {
+  const S = SIDEW(s), lo = S.toLowerCase();
+  const H = {group:"hand"}, F = {group:"foot"};
+  reg(`hand-${s}-palm`, `${S} palm`, "21547004", s, H);
+  reg(`hand-${s}-back`, `Back of ${lo} hand`, "85562004", s, H);
+  reg(`hand-${s}-wrist`, `${S} wrist`, "74670003", s, H);
+  FINGERS.forEach(f => { reg(`hand-${s}-${f.k}`, `${S} ${f.name}`, f.sct, s, H);
+    (f.joints||FJ).forEach(([j,jn]) => reg(`hand-${s}-${f.k}-${j}`, `${S} ${f.name}, ${jn}`, f.sct, s, Object.assign({joint:true},H))); });
+  reg(`foot-${s}-forefoot`, `${S} ball of foot (forefoot)`, "56459004", s, F);
+  reg(`foot-${s}-mid`, `Top of ${lo} foot`, "56459004", s, F);
+  reg(`foot-${s}-ankle`, `${S} ankle`, "70258002", s, F);
+  reg(`foot-${s}-medmal`, `${S} inner ankle bone`, "344001", s, F);
+  reg(`foot-${s}-latmal`, `${S} outer ankle bone`, "344001", s, F);
+  reg(`foot-${s}-heel`, `${S} heel`, "76853006", s, F);
+  TOES.forEach(t => { reg(`foot-${s}-${t.k}`, `${S} ${t.name}`, t.sct, s, F);
+    (t.joints||TJ).forEach(([j,jn]) => reg(`foot-${s}-${t.k}-${j}`, `${S} ${t.name}, ${jn}`, t.sct, s, Object.assign({joint:true},F))); });
+});
+
+/* Main figure geometry (viewer-left half) */
+const P = d => ({t:"p",d});
+const R = (x,y,w,h,rx,tf) => ({t:"r",x,y,w,h,rx,tf});
+const G = {
+  head:"M100,8 C112,8 120,18 120,31 C120,43 115,52 108,56 C104,58 96,58 92,56 C85,52 80,43 80,31 C80,18 88,8 100,8 Z",
+  neck:"M92,50 L108,50 L110,72 L90,72 Z",
+  shoulder:"M90,71 C80,72 69,74 63,79 C57,84 54,93 54,104 L56,109 L70,106 C70,96 73,86 79,78 C82,75 86,72 90,71 Z",
+  chest:"M100,72 L90,71 C86,72 82,75 79,78 C73,86 70,96 70,106 C70,113 71,119 72,125 L100,125 Z",
+  uarm:"M56,109 C53,121 51,135 51,149 L64,150 C64,137 66,121 70,106 Z",
+  elbow:"M51,149 C50,153 50,157 50,161 L63,161 C63,157 63,153 64,150 Z",
+  farm:"M50,161 C48,175 46,189 46,200 L56,201 C57,189 60,175 63,161 Z",
+  wrist:"M46,200 L45.5,207 L56.5,207 L56,201 Z",
+  palm:"M45.5,207 C44,212 44,219 45,225 L57,225 C58,219 58,212 56.5,207 Z",
+  abdu:"M72,125 L100,125 L100,156 L76,156 C75,146 73,135 72,125 Z",
+  abdl:"M76,156 L100,156 L100,184 L79,184 C78,174 77,165 76,156 Z",
+  hip:"M76,158 C73,170 70,181 69,193 C69,199 70,205 72,210 L86,206 C83,199 80,191 79,184 C78,175 77,166 76,158 Z",
+  groin:"M79,184 L121,184 C120,192 117,200 114,206 L100,216 L86,206 C83,200 80,192 79,184 Z",
+  thigh:"M72,210 C72,232 73,257 76,283 L95,283 C96,262 98,240 100,216 L86,206 Z",
+  knee:"M76,283 C76,291 76,298 77,305 L94,305 C94,298 94,291 95,283 Z",
+  shin:"M77,305 C76,318 76,331 78,345 C80,360 81,370 82,379 L92,379 C93,366 94,351 95,336 C95,325 95,315 94,305 Z",
+  ankle:"M82,379 L81,389 L94,389 L92,379 Z",
+  foottop:"M81,389 C79,395 77,400 77,404 L97,404 C97,399 96,394 94,389 Z",
+  flank:"M72,125 L86,125 L86,172 L77,172 C76,156 74,140 72,125 Z",
+  lback:"M86,125 L100,125 L100,172 L86,172 Z",
+  sacrum:"M86,172 L114,172 L111,190 L100,198 L89,190 Z",
+  butt:"M77,172 L86,172 L89,190 L100,198 L100,216 L86,213 C78,210 72,204 70,195 C70,186 72,178 77,172 Z",
+  heel:"M81,389 C80,397 82,405 87.5,406 C93,405 95,397 94,389 Z",
+};
+const MAIN_FINGERS = [ ["index",R(45.2,223,2.8,17,1.4)], ["middle",R(48.2,223,2.8,19,1.4)], ["ring",R(51.2,223,2.8,17,1.4)], ["little",R(54.2,223,2.6,13,1.3)], ["thumb",R(41.6,209,3.4,13,1.7,"rotate(18 44 209)")] ];
+const MAIN_TOES = [ ["toe5",R(77.6,402,3.3,6,1.6)], ["toe4",R(81.2,402,3.3,7,1.6)], ["toe3",R(84.8,402,3.4,8,1.7)], ["toe2",R(88.5,402,3.6,9,1.8)], ["toe1",R(92.4,402,4.8,10,2.2)] ];
+const ARM = (handFace) => [
+  {k:"uarm"}, {k:"elbow"}, {k:"farm"}, {ref:"hand","part":"wrist",sh:P(G.wrist)}, {ref:"hand",part:handFace,sh:P(G.palm)},
+  ...MAIN_FINGERS.map(([p,sh])=>({ref:"hand",part:p,sh,agg:true})),
+];
+const FRONT = [
+  {c:"neck", name:"Neck (front)", sct:"45048000"}, {c:"head", name:"Head and face", sct:"69536005"},
+  {k:"shoulder", name:"shoulder", sct:"16982005"}, {k:"chest", name:"chest", sct:"51185008"},
+  {k:"abdu", name:"upper abdomen", sct:{R:"50519007",L:"86367003"}, noLat:true},
+  {k:"abdl", name:"lower abdomen", sct:{R:"48544008",L:"68505006"}, noLat:true},
+  {k:"thigh", name:"thigh (front)", sct:"68367000"}, {k:"hip", name:"hip", sct:"29836001"},
+  {c:"groin", name:"Groin / pelvis", sct:"12921003"},
+  {k:"knee", name:"knee", sct:"49076000"}, {k:"shin", name:"shin", sct:"30021000"},
+  {ref:"foot",part:"ankle",sh:P(G.ankle)}, {ref:"foot",part:"mid",sh:P(G.foottop)},
+  ...MAIN_TOES.map(([p,sh])=>({ref:"foot",part:p,sh,agg:true})),
+  {k:"uarm", name:"upper arm", sct:"40983000"}, {k:"elbow", name:"elbow", sct:"16953009"}, {k:"farm", name:"forearm", sct:"14975008"},
+  ...ARM("palm").slice(3),
+];
+const BACK = [
+  {c:"neck", name:"Back of neck", sct:"45048000"}, {c:"head", name:"Back of head", sct:"69536005"},
+  {k:"shoulder", name:"shoulder blade area", sct:"16982005"}, {k:"chest", name:"upper back", sct:"77568009", key:"uback"},
+  {k:"flank", name:"flank", sct:"58602004"}, {k:"lback", name:"lower back", sct:"37822005"},
+  {k:"thigh", name:"back of thigh", sct:"68367000", key:"hams"}, {k:"butt", name:"buttock", sct:"46862004"},
+  {c:"sacrum", name:"Tailbone / sacrum", sct:"54735007"},
+  {k:"knee", name:"back of knee", sct:"49076000", key:"pknee"}, {k:"shin", name:"calf", sct:"53840002", key:"calf"},
+  {ref:"foot",part:"ankle",sh:P(G.ankle)}, {ref:"foot",part:"heel",sh:P(G.heel)},
+  {k:"uarm", name:"back of upper arm", sct:"40983000"}, {k:"elbow", name:"back of elbow", sct:"16953009"}, {k:"farm", name:"back of forearm", sct:"14975008"},
+  ...ARM("back").slice(3),
+];
+/* Resolve specs into drawable items with region ids */
+function resolve(view, specs){
+  const leftSide = view==="front" ? "R" : "L", rightSide = leftSide==="R" ? "L" : "R";
+  const items = [];
+  specs.forEach(sp => {
+    if(sp.c){ const id=`${view}-${sp.c}`; reg(id, sp.name, sp.sct, null, {view}); items.push({id, sh:P(G[sp.c])}); return; }
+    [[leftSide,false],[rightSide,true]].forEach(([side,mir]) => {
+      if(sp.ref){ items.push({id:`${sp.ref}-${side}-${sp.part}`, sh:sp.sh, mir, agg:sp.agg}); return; }
+      const id = `${view}-${sp.key||sp.k}-${side}`;
+      const code = typeof sp.sct==="object" ? sp.sct[side] : sp.sct;
+      reg(id, `${SIDEW(side)} ${sp.name}`, code, sp.noLat?null:side, {view});
+      items.push({id, sh:P(G[sp.k]), mir});
+    });
+  });
+  return items;
+}
+const VIEWS = { front: resolve("front",FRONT), back: resolve("back",BACK) };
+
+/* Close-up geometry: patient's RIGHT hand palm up and RIGHT foot from above, as the patient sees them. Mirrored for left. */
+function handItems(s){
+  const it = [];
+  it.push({id:`hand-${s}-wrist`, sh:P("M48,172 L119,172 L114,202 L53,202 Z")});
+  it.push({id:`hand-${s}-palm`, sh:P("M38,100 L116,100 C124,118 127,146 120,172 L46,172 C40,150 36,124 38,100 Z")});
+  it.push({deco:true, sh:P("M48,128 C70,122 92,124 112,134"), cls:"crease"});
+  it.push({deco:true, sh:P("M46,146 C66,140 84,146 98,160"), cls:"crease"});
+  const base = 104;
+  [["little",40,15,42],["ring",57,17,20],["middle",76,18,10],["index",96,17,20]].forEach(([k,x,w,top]) => {
+    const L = base-top;
+    it.push({id:`hand-${s}-${k}`, sh:R(x,top,w,L+6,w/2)});
+    it.push({deco:true, cls:"crease", sh:P(`M${x+3},${top+L*0.3} H${x+w-3} M${x+3},${top+L*0.62} H${x+w-3}`)});
+    [["DIP",top+L*0.3],["PIP",top+L*0.62],["MCP",base]].forEach(([j,y]) => it.push({id:`hand-${s}-${k}-${j}`, sh:{t:"c",cx:x+w/2,cy:y,r:4.6}, joint:true}));
+  });
+  const tf = "rotate(35 118 160)";
+  it.push({id:`hand-${s}-thumb`, sh:R(110,96,17,64,8.5,tf)});
+  it.push({id:`hand-${s}-thumb-IP`, sh:{t:"c",cx:118.5,cy:114,r:4.8,tf}, joint:true});
+  it.push({id:`hand-${s}-thumb-MCP`, sh:{t:"c",cx:118.5,cy:140,r:4.8,tf}, joint:true});
+  it.push({id:`hand-${s}-thumb-CMC`, sh:{t:"c",cx:113,cy:166,r:4.8}, joint:true});
+  return it;
+}
+function footItems(s){
+  const it = [];
+  it.push({id:`foot-${s}-ankle`, sh:P("M60,164 L112,164 C113,178 112,192 110,206 L62,206 C60,192 59,178 60,164 Z")});
+  it.push({id:`foot-${s}-mid`, sh:P("M46,116 L122,116 C120,134 116,150 112,164 L60,164 C58,148 52,132 46,116 Z")});
+  it.push({id:`foot-${s}-forefoot`, sh:P("M37,76 C34,90 38,104 46,116 L122,116 C128,104 132,90 130,76 Z")});
+  const base = 76;
+  [["toe1",40,24,16,6,["IP",.45]],["toe2",67,15,20,4.4,["PIP",.5]],["toe3",84,14,28,4.2,["PIP",.5]],["toe4",100,13,38,4,["PIP",.5]],["toe5",115,12,50,3.8,["PIP",.5]]]
+    .forEach(([k,x,w,top,r,[mj,f]]) => {
+      const L = base-top;
+      it.push({id:`foot-${s}-${k}`, sh:R(x,top,w,L+6,w/2)});
+      it.push({id:`foot-${s}-${k}-${mj}`, sh:{t:"c",cx:x+w/2,cy:top+L*f,r}, joint:true});
+      it.push({id:`foot-${s}-${k}-MTP`, sh:{t:"c",cx:x+w/2,cy:base+2,r}, joint:true});
+    });
+  it.push({id:`foot-${s}-medmal`, sh:{t:"c",cx:63,cy:186,r:8}, joint:true});
+  it.push({id:`foot-${s}-latmal`, sh:{t:"c",cx:109,cy:188,r:8}, joint:true});
+  return it;
+}
+
+const QUALITIES = ["Aching","Sharp","Burning","Throbbing","Shooting","Tingling","Numb","Cramping","Stabbing","Pressure","Stiff"];
+
+/* ---------- State ---------- */
+const SAMPLE_STORY = "It started about three weeks ago after I helped my daughter move. My lower back on the right side aches all the time, kind of like a toothache, and when I bend over to pick up the laundry it grabs me and shoots down the back of my right leg, almost to my knee. Sitting in the car for more than twenty minutes is the worst. Ibuprofen takes the edge off for a few hours. And at night my feet burn and tingle, both of them, like pins and needles. That's been going on longer, maybe since the summer. I'm not sleeping well and honestly I'm scared I did something permanent.";
+const SAMPLE_SITES = {
+  "back-lback-R": {severity:6, qualities:["Aching"]},
+  "back-hams-R": {severity:5, qualities:["Shooting","Sharp"]},
+  "foot-R-mid": {severity:4, qualities:["Burning","Tingling"]},
+  "foot-L-mid": {severity:4, qualities:["Burning","Tingling"]},
+};
+const RECORD = {
+  name:"Maria Alvarez (fictional)", age:58, sex:"female", birthDate:"1968-03-14",
+  conditions:["Hypertension","Type 2 diabetes mellitus","Hyperlipidemia"],
+  meds:["Lisinopril 20 mg daily","Metformin 1000 mg twice daily","Atorvastatin 40 mg nightly"],
+  allergies:["Sulfonamide antibiotics (rash)"],
+  labs:["Hemoglobin A1c 7.4% (Aug 2026)","eGFR 68 mL/min/1.73m2 (Aug 2026)"]
+};
+const EXAMPLE = {
+  patientSummary:"For about three weeks, since helping your daughter move, the right side of your lower back has ached all the time, like a toothache. Bending over or sitting in the car for more than twenty minutes sets off a sharp pain that shoots down the back of your right leg to just above the knee. Ibuprofen eases it for a few hours. Separately, both feet have burned and tingled at night since around the summer, and you're not sleeping well. You also said you're scared you did something permanent. All of this is recorded below for your doctor.",
+  chiefComplaint:"Right low back pain radiating to posterior right thigh x 3 weeks; bilateral foot burning/tingling x ~4 months.",
+  hpi:"58-year-old female (history per record: hypertension, type 2 diabetes mellitus, hyperlipidemia; medications: lisinopril, metformin, atorvastatin) reports 3 weeks of right-sided low back pain with onset after heavy lifting during a household move. Pain is constant, dull and aching (6/10), described as \"like a toothache,\" with intermittent sharp, shooting pain radiating to the posterior right thigh, ending above the knee (5/10). Worse with forward bending and sitting longer than 20 minutes; partially relieved by ibuprofen for several hours. Separately reports bilateral, symmetric burning and tingling of the feet (4/10), worse at night, with gradual onset approximately 4 months ago. Reports poor sleep and worry about lasting harm. Not reported: bowel or bladder changes, numbness in the groin, leg weakness, fever, prior episodes, ibuprofen dose.",
+  opqrst:{
+    onset:"Back: ~3 weeks ago, after lifting during a move. Feet: gradual, ~4 months.",
+    provocation:"Worse with forward bending and sitting >20 min. Better with ibuprofen for a few hours.",
+    quality:"Back: dull, aching, constant. Leg: sharp, shooting. Feet: burning, tingling.",
+    region:"Right low back, radiating to back of right thigh, stops above knee. Both feet, symmetric.",
+    severity:"Back 6/10, leg 5/10, feet 4/10.",
+    timing:"Back constant with flares on bending or sitting. Feet worse at night.",
+    associated:"Poor sleep, worry. Nothing else reported."
+  },
+  clinicalTerms:[
+    {patient:"aches all the time, kind of like a toothache", clinical:"constant, dull, aching pain"},
+    {patient:"it grabs me and shoots down the back of my leg", clinical:"intermittent sharp pain radiating to posterior thigh"},
+    {patient:"almost to my knee", clinical:"radiation ends proximal to the knee"},
+    {patient:"when I bend over to pick up the laundry", clinical:"aggravated by forward flexion"},
+    {patient:"sitting in the car for more than twenty minutes", clinical:"aggravated by prolonged sitting (>20 min)"},
+    {patient:"takes the edge off for a few hours", clinical:"partial, temporary relief with ibuprofen"},
+    {patient:"feet burn and tingle, like pins and needles", clinical:"bilateral burning paresthesias of the feet"},
+    {patient:"scared I did something permanent", clinical:"patient reports anxiety about lasting harm"}
+  ],
+  followUps:[
+    "Have you had any change in bladder or bowel control, or numbness between your legs or on your inner thighs?",
+    "Have you noticed any weakness in your leg or foot, or catching your toes when you walk?",
+    "Have you had back pain like this before? If so, when?",
+    "How much ibuprofen do you take, and how many times a day?",
+    "Does the burning or tingling ever spread above your ankles, or into your hands?",
+    "Have you noticed any cuts, blisters, or color changes on your feet?",
+    "Have you had fever, chills, or weight loss you can't explain?",
+    "What does the pain keep you from doing at home or at work?"
+  ]
+};
+
+const state = {
+  view:"front",
+  detail:null,
+  sites: JSON.parse(JSON.stringify(SAMPLE_SITES)),
+  active:null,
+  result: EXAMPLE,
+  isExample: true,
+  tab:"you",
+  generatedAt: new Date().toISOString()
+};
+
+/* ---------- Body map ---------- */
+const svg = $("body"), dsvg = $("detail");
+const NS = "http://www.w3.org/2000/svg";
+function heat(sev){ const h = 42 - (sev/10)*67; return `hsl(${(h+360)%360} 82% ${60 - sev*1.5}%)`; }
+function sevFor(id, agg){
+  if(!agg) return state.sites[id] ? state.sites[id].severity : null;
+  let m=null; Object.keys(state.sites).forEach(k=>{ if(k===id||k.startsWith(id+"-")) m=Math.max(m??0,state.sites[k].severity); }); return m;
+}
+function mkShape(sh){
+  let el;
+  if(sh.t==="p"){ el=document.createElementNS(NS,"path"); el.setAttribute("d",sh.d); }
+  else if(sh.t==="r"){ el=document.createElementNS(NS,"rect"); ["x","y","rx"].forEach(a=>el.setAttribute(a,sh[a])); el.setAttribute("width",sh.w); el.setAttribute("height",sh.h); }
+  else { el=document.createElementNS(NS,"circle"); el.setAttribute("cx",sh.cx); el.setAttribute("cy",sh.cy); el.setAttribute("r",sh.r); }
+  if(sh.tf) el.setAttribute("transform",sh.tf);
+  return el;
+}
+function paint(target, items, mirrorWidth){
+  items.forEach(it => {
+    const el = mkShape(it.sh);
+    if(it.deco){ el.setAttribute("class", it.cls||"deco"); }
+    else {
+      const r = REGIONS[it.id]; const sev = sevFor(it.id, it.agg);
+      el.setAttribute("class","region"+(it.joint?" joint":"")+(state.active===it.id?" active":""));
+      el.setAttribute("tabindex","0"); el.setAttribute("role","button");
+      el.setAttribute("aria-label", r.label + (sev!=null?`, marked ${sev} of 10`:""));
+      el.setAttribute("aria-pressed", state.sites[it.id]?"true":"false");
+      if(sev!=null) el.style.fill = heat(sev);
+      const t=document.createElementNS(NS,"title"); t.textContent=r.label; el.appendChild(t);
+      el.addEventListener("click",()=>pick(it.id));
+      el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(it.id);} });
+    }
+    if(it.mir){ const g=document.createElementNS(NS,"g"); g.setAttribute("transform",`matrix(-1 0 0 1 ${mirrorWidth} 0)`); g.appendChild(el); target.appendChild(g); }
+    else target.appendChild(el);
+  });
+}
+function drawBody(){
+  svg.textContent = "";
+  // ears and soft landmarks sit under / over the clickable regions
+  paint(svg, [{deco:true,cls:"deco solid",sh:{t:"c",cx:80.5,cy:33,r:4}},{deco:true,cls:"deco solid",sh:{t:"c",cx:119.5,cy:33,r:4}}], 200);
+  paint(svg, VIEWS[state.view], 200);
+  const marks = state.view==="front"
+    ? [ {sh:P("M90,74 C84,76 78,77 70,80 M110,74 C116,76 122,77 130,80")}, {sh:P("M100,126 V182")}, {sh:{t:"c",cx:100,cy:170,r:1.2}} ]
+    : [ {sh:P("M100,60 V172")}, {sh:P("M82,92 C86,100 88,108 86,116 M118,92 C114,100 112,108 114,116")} ];
+  paint(svg, marks.map(m=>Object.assign({deco:true},m)), 200);
+  $("tag-l").textContent = state.view==="front" ? "Your right" : "Your left";
+  $("tag-r").textContent = state.view==="front" ? "Your left" : "Your right";
+  $("v-front").setAttribute("aria-pressed", state.view==="front");
+  $("v-back").setAttribute("aria-pressed", state.view==="back");
+}
+function drawDetail(){
+  document.querySelectorAll("[data-zoom]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.zoom===state.detail));
+  const box=$("detail-box");
+  if(!state.detail){ box.hidden=true; return; }
+  box.hidden=false; dsvg.textContent="";
+  const [grp,s] = state.detail.split("-");
+  const items = (grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
+  paint(dsvg, items, 170);
+  $("detail-cap").textContent = grp==="hand"
+    ? `Your ${SIDEW(s).toLowerCase()} hand, palm up, as you look at it. Circles are knuckles.`
+    : `Your ${SIDEW(s).toLowerCase()} foot from above, as you look down at it. Circles are joints and ankle bones.`;
+}
+document.querySelectorAll("[data-zoom]").forEach(b=>b.onclick=()=>{ state.detail = state.detail===b.dataset.zoom?null:b.dataset.zoom; drawDetail(); });
+function redraw(){ drawBody(); drawDetail(); drawEditor(); drawSites(); syncHandoff(); }
+function pick(id){
+  const r = REGIONS[id];
+  if(state.sites[id]){ delete state.sites[id]; if(state.active===id) state.active=null; }
+  else { state.sites[id] = {severity:5, qualities:[]}; state.active = id; }
+  if(r.group) state.detail = `${r.group}-${r.side}`;
+  redraw();
+}
+function focusSite(id){
+  const r = REGIONS[id]; state.active = id;
+  if(r.view) state.view = r.view;
+  if(r.group) state.detail = `${r.group}-${r.side}`;
+  redraw();
+}
+function drawEditor(){
+  const ed=$("editor"); const id=state.active; const site=state.sites[id];
+  if(!id||!site){ ed.hidden=true; return; }
+  ed.hidden=false;
+  $("ed-title").textContent = REGIONS[id].label;
+  $("ed-sev").value = site.severity; $("ed-sevn").textContent = site.severity;
+  const q=$("ed-q"); q.textContent="";
+  QUALITIES.forEach(name=>{
+    const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=name;
+    b.setAttribute("aria-pressed", site.qualities.includes(name));
+    b.onclick=()=>{ const i=site.qualities.indexOf(name); i>=0?site.qualities.splice(i,1):site.qualities.push(name); b.setAttribute("aria-pressed", i<0); drawSites(); syncHandoff(); };
+    q.appendChild(b);
+  });
+}
+$("ed-sev").addEventListener("input",e=>{
+  const site=state.sites[state.active]; if(!site) return;
+  site.severity=+e.target.value; $("ed-sevn").textContent=site.severity; drawBody(); drawDetail(); drawSites(); syncHandoff();
+});
+
+$("v-front").onclick=()=>{ state.view="front"; drawBody(); };
+$("v-back").onclick=()=>{ state.view="back"; drawBody(); };
+function drawSites(){
+  const ul=$("sites"); ul.textContent="";
+  const ids=Object.keys(state.sites);
+  if(!ids.length){ const li=document.createElement("li"); li.style.cursor="default"; li.innerHTML='<span class="q">None yet. Tap the body to add one.</span>'; ul.appendChild(li); return; }
+  ids.sort((a,b)=>state.sites[b].severity-state.sites[a].severity).forEach(id=>{
+    const s=state.sites[id], r=REGIONS[id];
+    const li=document.createElement("li"); li.tabIndex=0;
+    const dot=document.createElement("span"); dot.className="dot"; dot.style.background=heat(s.severity);
+    const nm=document.createElement("span"); nm.textContent=r.label;
+    const q=document.createElement("span"); q.className="q"; q.textContent=s.qualities.join(", ").toLowerCase();
+    const n=document.createElement("span"); n.className="n"; n.textContent=s.severity+"/10";
+    li.append(dot,nm,q,n);
+    const go=()=>focusSite(id);
+    li.onclick=go; li.onkeydown=e=>{ if(e.key==="Enter"){ go(); } };
+    ul.appendChild(li);
+  });
+}
+function sitesText(){
+  const ids=Object.keys(state.sites);
+  if(!ids.length) return "(no areas marked)";
+  return ids.map(id=>{ const s=state.sites[id]; return `- ${REGIONS[id].label}: ${s.severity}/10${s.qualities.length?", "+s.qualities.join(", ").toLowerCase():""}`; }).join("\n");
+}
+
+/* ---------- Voice ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, listening=false;
+const DICTATE = "The microphone isn't available in this view. Use your device's dictation instead: the microphone key on a phone keyboard, Fn twice on a Mac, or Windows key + H on a PC.";
+function micNote(msg, alert){ const n=$("mic-note"); n.textContent=msg; n.classList.toggle("alert",!!alert); }
+function setListening(on){ listening=on; $("b-mic").classList.toggle("rec",on); $("mic-label").textContent = on?"Stop listening":"Speak"; }
+$("b-mic").onclick=()=>{
+  if(listening){ try{ rec&&rec.stop(); }catch(e){} setListening(false); return; }
+  if(!SR){ micNote(DICTATE,true); $("story").focus(); return; }
+  try{
+    rec=new SR(); rec.continuous=true; rec.interimResults=false; rec.lang="en-US";
+    rec.onresult=e=>{ let add=""; for(let i=e.resultIndex;i<e.results.length;i++){ if(e.results[i].isFinal) add+=e.results[i][0].transcript; }
+      if(add){ const t=$("story"); t.value=(t.value.trim()+" "+add.trim()).trim(); } };
+    rec.onerror=e=>{ setListening(false); micNote(e.error==="no-speech"?"I didn't catch anything. Try again, a little closer to the mic.":DICTATE, e.error!=="no-speech"); };
+    rec.onend=()=>setListening(false);
+    rec.start(); setListening(true); micNote("Listening. Speak naturally; press Stop listening when you're done.");
+  }catch(e){ setListening(false); micNote(DICTATE,true); }
+};
+$("b-clear").onclick=()=>{
+  $("story").value=""; state.sites={}; state.active=null; state.detail=null; redraw();
+  micNote("Talk the way you would to a friend. Details like \"worse in the car\" or \"like a toothache\" are exactly what helps.");
+  $("story").focus(); syncHandoff();
+};
+
+/* ---------- Translate (Claude via sample capability) ---------- */
+let sample=null, ctl=null;
+const statusEl=$("status");
+/* Two ways to reach Claude: inside a Claude artifact (the viewer's own account), or on a self-hosted site through /api/translate (your server-side key). */
+const API_URL = "/api/translate";
+const IN_CLAUDE = !!window.claude;
+(async()=>{ if(!IN_CLAUDE) return;
+  try{ sample = await window.claude.use("sample"); }catch(e){ sample=null; }
+  if(!sample){ $("b-go").textContent="Show example output"; statusEl.textContent="Live translation runs when this page is opened in Claude."; } })();
+async function translateViaApi(story, useRecord, signal){
+  const sites=Object.keys(state.sites).map(id=>({label:REGIONS[id].label, severity:state.sites[id].severity, qualities:state.sites[id].qualities}));
+  let res;
+  try{ res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({story,sites,useRecord}),signal}); }
+  catch(e){ throw {code: e&&e.name==="AbortError" ? "cancelled" : "upstream_error"}; }
+  if(res.status===429) throw {code:"rate_limited"};
+  if(!res.ok) throw {code:"upstream_error"};
+  return res.json();
+}
+
+function buildPrompt(story, useRecord){
+  const rec = useRecord ? `\nHEALTH RECORD (fictional demo patient). You may restate history and medications as documented context. Do not interpret them or connect them to the symptoms.\nName: ${RECORD.name}; Age ${RECORD.age}; ${RECORD.sex}\nConditions: ${RECORD.conditions.join("; ")}\nMedications: ${RECORD.meds.join("; ")}\nAllergies: ${RECORD.allergies.join("; ")}\nLabs: ${RECORD.labs.join("; ")}\n` : "\nNo health record provided. Do not invent age, sex, history or medications; say 'Patient' instead.\n";
+  return `You are a clinical intake scribe inside a patient-facing demo called "Know My Health". A patient marked pain areas on a body map and told their story in their own words, to start the conversation with their doctor and to record episodes between visits.
+
+Your only job: record faithfully what the patient said, put it in standard clinical documentation language, and list the history questions a clinician would still ask to complete the picture.
+
+Strict rules:
+- Do NOT diagnose, name or hint at possible conditions or causes, or interpret what symptoms might mean.
+- Do NOT suggest treatment, medication changes, self-care, tests, imaging, or when to seek care.
+- Do NOT add reassurance about outcomes. You may acknowledge feelings the patient expressed.
+- Do not add facts that are not in the story, body map, or record. State what was not reported.
+
+BODY MAP (patient-selected; severity on 0-10 numeric rating scale):
+${sitesText()}
+${rec}
+PATIENT STORY (verbatim):
+"""${story}"""
+
+Reply with ONLY one JSON object, no other text, with exactly these keys:
+{
+ "patientSummary": "3-5 sentences in second person at a 6th-8th grade reading level that reflect back only what the patient told you, including any feelings they expressed",
+ "chiefComplaint": "one line, clinical shorthand",
+ "hpi": "History of Present Illness paragraph in standard clinical register; quote distinctive patient phrases; end with a 'Not reported:' list of standard history elements the patient did not mention",
+ "opqrst": {"onset":"","provocation":"","quality":"","region":"","severity":"","timing":"","associated":""},
+ "clinicalTerms": [{"patient":"short verbatim phrase from the story","clinical":"descriptive clinical equivalent, not a diagnosis"}],
+ "followUps": ["5-8 questions a clinician would ask at intake or exam to complete this history, in plain language addressed to the patient, including standard screening questions relevant to these symptoms; questions only, with no explanation of what an answer might mean"]
+}
+clinicalTerms: 5-8 pairs quoting the patient's own words. Use "Not reported" for any OPQRST element the patient did not describe.`;
+}
+
+function errorCopy(code){
+  return ({ not_granted:"Claude access wasn't allowed for this page, so the example stays up.", sampling_disabled:"Claude isn't available on this account.",
+    rate_limited:"You've reached the demo's limit for now. Please try again later.", session_expired:"Please sign in to Claude again.",
+    refused:"Claude couldn't process that text. Try rephrasing.", invalid_json:"The answer came back malformed. Press Translate to try again.",
+    empty_completion:"Claude returned nothing. Try adding a bit more detail." })[code] || "Something went wrong reaching Claude. Press Translate to try again.";
+}
+
+$("b-go").onclick=async()=>{
+  const story=$("story").value.trim();
+  if(!sample && IN_CLAUDE){
+    state.result=EXAMPLE; state.isExample=true; state.tab="you"; renderResult();
+    statusEl.textContent="Showing the worked example. Open this page in Claude to translate your own story."; $("out").scrollIntoView({behavior:"smooth",block:"start"}); return;
+  }
+  if(story.length<15){ statusEl.textContent="Add a sentence or two about what's happening first."; $("story").focus(); return; }
+  ctl=new AbortController();
+  $("b-go").disabled=true; $("b-stop").hidden=false;
+  statusEl.textContent="Listening to your story…";
+  let t0=Date.now(), ticker=setInterval(()=>{ const s=Math.round((Date.now()-t0)/1000); statusEl.textContent = s<8?"Listening to your story…":s<20?"Mapping words to clinical terms…":"Writing your note…"; },1500);
+  try{
+    const useRec=$("use-record").checked;
+    const data = sample ? await sample.json(buildPrompt(story,useRec), { signal:ctl.signal, cache:false }) : await translateViaApi(story,useRec,ctl.signal);
+    if(!data || typeof data!=="object" || !data.hpi) throw {code:"invalid_json"};
+    state.result=normalize(data); state.isExample=false; state.tab="you"; state.generatedAt=new Date().toISOString();
+    renderResult(); statusEl.textContent="Done. Review it, then carry it forward below.";
+    $("out").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(e){
+    if(e && e.code==="cancelled") statusEl.textContent="Stopped.";
+    else { statusEl.textContent=errorCopy(e&&e.code); if(e&&(e.code==="not_granted"||e.code==="sampling_disabled")){ sample=null; $("b-go").textContent="Show example output"; } }
+  }finally{ clearInterval(ticker); $("b-go").disabled=false; $("b-stop").hidden=true; }
+};
+$("b-stop").onclick=()=>ctl&&ctl.abort();
+
+async function saveFile(name, blob){
+  if(IN_CLAUDE){ const d=await window.claude.use("downloads").catch(()=>null); if(!d) throw {code:"unavailable"}; return d.save({filename:name, data:blob}); }
+  const url=URL.createObjectURL(blob), a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+function normalize(d){
+  const arr=v=>Array.isArray(v)?v:[];
+  return { patientSummary:String(d.patientSummary||""), chiefComplaint:String(d.chiefComplaint||""), hpi:String(d.hpi||""),
+    opqrst: d.opqrst&&typeof d.opqrst==="object"?d.opqrst:{},
+    clinicalTerms: arr(d.clinicalTerms).filter(x=>x&&x.patient&&x.clinical),
+    followUps: arr(d.followUps).map(String) };
+}
+
+/* ---------- Between-visit log (kept only in this browser) ---------- */
+const LOG_KEY="kmh-log-v1";
+const EXAMPLE_LOG=[
+  {at:"2026-10-18T21:40:00", example:true, chiefComplaint:"Right low back pain after lifting; shooting pain to back of right thigh.", sites:[{id:"back-lback-R",severity:7,qualities:["Aching"]},{id:"back-hams-R",severity:6,qualities:["Shooting"]}], note:"Helped daughter move boxes Saturday. Couldn't get comfortable in the car on the drive home."},
+  {at:"2026-10-25T23:15:00", example:true, chiefComplaint:"Burning and tingling in both feet at night.", sites:[{id:"foot-R-mid",severity:4,qualities:["Burning","Tingling"]},{id:"foot-L-mid",severity:4,qualities:["Burning","Tingling"]}], note:"Woke up twice. Took ibuprofen at 11 pm."}
+];
+function loadLog(){ try{ const v=JSON.parse(localStorage.getItem(LOG_KEY)||"[]"); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function saveLog(list){ try{ localStorage.setItem(LOG_KEY,JSON.stringify(list)); return true; }catch(e){ return false; } }
+let LOG = loadLog();
+function shownLog(){ return LOG.length ? LOG : EXAMPLE_LOG; }
+function addToLog(){
+  const sites=Object.keys(state.sites).map(id=>({id,severity:state.sites[id].severity,qualities:[...state.sites[id].qualities]}));
+  LOG = [{at:new Date().toISOString(), chiefComplaint:state.result.chiefComplaint, sites, note:$("story").value.trim().slice(0,600)}, ...LOG];
+  return saveLog(LOG);
+}
+function fmtWhen(iso){ try{ return new Date(iso).toLocaleString(undefined,{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}); }catch(e){ return iso; } }
+
+/* ---------- Render result ---------- */
+const TABS=[["you","For you"],["note","Clinical note"],["xlate","Story → data"],["ask","Doctor's questions"],["log","Between visits"],["fhir","FHIR record"]];
+function el(tag,cls,text){ const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e; }
+const answers={};
+function renderResult(){
+  const r=state.result; $("ex-badge").hidden=!state.isExample;
+  const tabs=$("tabs"); tabs.textContent="";
+  TABS.forEach(([k,label])=>{
+    const b=el("button","tab",label); b.type="button"; b.setAttribute("role","tab"); b.setAttribute("aria-selected",state.tab===k); b.id="tab-"+k;
+    if(k==="log"){ b.appendChild(el("span","cnt",String(shownLog().length))); }
+    b.onclick=()=>{ state.tab=k; renderResult(); }; tabs.appendChild(b);
+  });
+  const p=$("pane"); p.textContent=""; p.setAttribute("aria-labelledby","tab-"+state.tab);
+  if(state.tab==="you"){
+    p.appendChild(el("p","voice",r.patientSummary));
+    p.appendChild(el("p","note","This is a record of what you said. It doesn't diagnose anything or suggest treatment; that conversation is with your doctor.")).style.marginTop="12px";
+  }
+  if(state.tab==="note"){
+    const c=el("div","chart");
+    const cc=el("div"); cc.append(el("span","cc","CC: "), document.createTextNode(r.chiefComplaint)); c.appendChild(cc);
+    const h=el("div"); h.style.marginTop="12px"; h.append(el("span","cc","HPI: "), document.createTextNode(r.hpi)); c.appendChild(h);
+    const dl=el("dl","opq");
+    [["O","onset","Onset"],["P","provocation","Provokes / palliates"],["Q","quality","Quality"],["R","region","Region / radiation"],["S","severity","Severity"],["T","timing","Timing"],["+","associated","Associated"]]
+      .forEach(([l,k,t])=>{ if(!r.opqrst[k]) return; dl.append(el("dt",null,`${l} · ${t}`), el("dd",null,String(r.opqrst[k]))); });
+    c.appendChild(dl);
+    c.appendChild(el("div","note","Patient-reported. Recorded for clinician review; no assessment or plan.")).style.marginTop="12px";
+    p.appendChild(c);
+  }
+  if(state.tab==="xlate"){
+    const wrap=el("div"); wrap.style.overflowX="auto";
+    const t=el("table","xlate"); const th=el("tr"); th.append(el("th",null,"You said"),el("th",null,""),el("th",null,"Your chart says")); t.appendChild(th);
+    r.clinicalTerms.forEach(x=>{ const tr=el("tr"); tr.append(el("td",null,`“${x.patient}”`),el("td","arrow","→"),el("td",null,x.clinical)); t.appendChild(tr); });
+    wrap.appendChild(t); p.appendChild(wrap);
+  }
+  if(state.tab==="ask"){
+    p.appendChild(el("p","note","Your doctor will probably ask these to fill in the picture. Answer any you can, then add them to your story."));
+    const box=el("div","fups");
+    r.followUps.forEach((q,i)=>{
+      const row=el("div","fup"); const id="fu-"+i;
+      const lab=el("label",null,q); lab.htmlFor=id;
+      const inp=el("input"); inp.id=id; inp.type="text"; inp.placeholder="Your answer (optional)"; inp.value=answers[q]||"";
+      inp.oninput=()=>{ answers[q]=inp.value; };
+      row.append(lab,inp); box.appendChild(row);
+    });
+    p.appendChild(box);
+    const row=el("div","row"); row.style.marginTop="12px";
+    const add=el("button","btn","Add my answers to the story"); add.type="button"; const st=el("span","status");
+    add.onclick=()=>{
+      const lines=r.followUps.filter(q=>(answers[q]||"").trim()).map(q=>`${q} ${answers[q].trim()}`);
+      if(!lines.length){ st.textContent="Type an answer to at least one question first."; return; }
+      const t=$("story"); t.value=(t.value.trim()+"\n\nMore details: "+lines.join(" ")).trim();
+      st.textContent="Added. Press Translate my story to update the note."; t.scrollIntoView({behavior:"smooth",block:"center"});
+    };
+    row.append(add,st); p.appendChild(row);
+  }
+  if(state.tab==="log"){
+    p.appendChild(el("p","note","Record episodes as they happen so nothing gets lost between visits. Entries stay in this browser only."));
+    const row=el("div","row"); row.style.margin="10px 0";
+    const add=el("button","btn primary","Save today's entry"); add.type="button"; const st=el("span","status");
+    add.onclick=()=>{ if(!Object.keys(state.sites).length && !$("story").value.trim()){ st.textContent="Mark an area or tell your story first."; return; }
+      const ok=addToLog(); renderResult(); const s2=$("pane").querySelector(".status"); if(s2) s2.textContent = ok?"Saved to your log.":"Saved for this visit only; this browser won't keep it after you close the page."; };
+    row.append(add,st); p.appendChild(row);
+    if(!LOG.length) p.appendChild(el("p","badge","Example entries")).style.display="inline-block";
+    const list=el("ol","log");
+    shownLog().forEach(e=>{
+      const li=el("li"); li.append(el("div","when",fmtWhen(e.at)), el("strong",null,e.chiefComplaint));
+      const ss=el("div","log-sites"); e.sites.forEach(x=>{ const r2=REGIONS[x.id]; if(!r2) return; const sp=el("span","log-site"); const d=el("span","dot"); d.style.background=heat(x.severity); sp.append(d, document.createTextNode(`${r2.label} ${x.severity}/10`)); ss.appendChild(sp); });
+      li.appendChild(ss); if(e.note) li.appendChild(el("p","note",e.note)); list.appendChild(li);
+    });
+    p.appendChild(list);
+    if(LOG.length){ const clr=el("button","linkish","Clear my log"); clr.type="button"; let armed=false;
+      clr.onclick=()=>{ if(!armed){ armed=true; clr.textContent="Press again to delete all entries"; return; } LOG=[]; saveLog(LOG); renderResult(); };
+      p.appendChild(clr); }
+  }
+  if(state.tab==="fhir"){
+    const json=JSON.stringify(buildFHIR(),null,2);
+    p.appendChild(el("p","note","A FHIR R4 Bundle: one Observation per marked area and per logged episode (SNOMED CT body site, LOINC 72514-3 pain score), plus the history as a DocumentReference (LOINC 10164-2). Any FHIR-capable system can read it."));
+    const row=el("div","row"); row.style.margin="10px 0";
+    const cp=el("button","btn","Copy JSON"); cp.type="button"; const dl=el("button","btn","Download .json"); dl.type="button"; const st=el("span","status");
+    cp.onclick=()=>copy(json,st,"Copied FHIR bundle.");
+    dl.onclick=async()=>{ try{ await saveFile("know-my-health-fhir-bundle.json", new Blob([json],{type:"application/fhir+json"})); st.textContent="Saved."; }catch(e){ st.textContent = e&&e.code==="declined"?"Download cancelled.":"Download isn't available here. Use Copy JSON instead."; } };
+    row.append(cp,dl,st); p.appendChild(row);
+    p.appendChild(el("pre","code",json));
+  }
+  syncHandoff();
+}
+
+/* ---------- FHIR R4 ---------- */
+function uuid(){ return (crypto.randomUUID?crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replace(/x/g,()=>(Math.random()*16|0).toString(16))); }
+function b64(s){ return btoa(unescape(encodeURIComponent(s))); }
+function buildFHIR(){
+  const useRec=$("use-record").checked, now=state.generatedAt, r=state.result;
+  const pid=uuid(), pref="urn:uuid:"+pid;
+  const nmText = whoPatientName() || "Demo patient", dobIso = whoDobIso();
+  const patient = { resourceType:"Patient", id:pid, name:[{text:nmText}], ...(dobIso?{birthDate:dobIso}:{}), ...(useRec&&!readWho().name?{gender:"female"}:{}) };
+  const entries=[{fullUrl:pref,resource:patient}];
+  let author = {reference:pref};
+  const w = readWho();
+  if(w.role!=="patient"){
+    const rid=uuid(), RC={family:["FAMMEMB","family member"],guardian:["GUARD","guardian"]}[w.role];
+    entries.push({fullUrl:"urn:uuid:"+rid,resource:{resourceType:"RelatedPerson",id:rid,patient:{reference:pref},
+      relationship:[RC?{coding:[{system:"http://terminology.hl7.org/CodeSystem/v3-RoleCode",code:RC[0],display:RC[1]}],text:ROLE_LABEL[w.role]}:{text:ROLE_LABEL[w.role]}],
+      ...(w.byName?{name:[{text:w.byName}]}:{})}});
+    author = {reference:"urn:uuid:"+rid};
+  }
+  const obs=(id,s,when,note)=>{
+    const rg=REGIONS[id]; if(!rg) return; const oid=uuid();
+    const comps=[{code:{coding:[{system:"http://loinc.org",code:"72514-3",display:"Pain severity - 0-10 verbal numeric rating [Score] - Reported"}]},valueInteger:s.severity}];
+    if(s.qualities.length) comps.push({code:{text:"Pain quality (patient-reported)"},valueString:s.qualities.join(", ").toLowerCase()});
+    if(rg.side) comps.push({code:{coding:[{system:"http://snomed.info/sct",code:"272741003",display:"Laterality"}]},valueCodeableConcept:{coding:[{system:"http://snomed.info/sct",code:LAT[rg.side].code,display:LAT[rg.side].display}]}});
+    entries.push({fullUrl:"urn:uuid:"+oid,resource:{resourceType:"Observation",id:oid,status:"preliminary",
+      category:[{coding:[{system:"http://terminology.hl7.org/CodeSystem/observation-category",code:"survey",display:"Survey"}]}],
+      code:{coding:[{system:"http://snomed.info/sct",code:"22253000",display:"Pain"}],text:"Patient-reported pain"},
+      subject:{reference:pref}, effectiveDateTime:when, performer:[author],
+      bodySite:{coding:[{system:"http://snomed.info/sct",code:rg.sct}],text:rg.label},
+      component:comps, note:[{text:note}]}});
+  };
+  Object.keys(state.sites).forEach(id=>obs(id,state.sites[id],now,"Patient-reported via body map (current entry)."));
+  if(LOG.length) LOG.forEach(e=>e.sites.forEach(x=>obs(x.id,x,new Date(e.at).toISOString(),"Patient-logged episode between visits"+(e.note?": "+e.note.slice(0,200):"."))));
+  const narrative=`Chief complaint: ${r.chiefComplaint}\n\nHPI: ${r.hpi}`;
+  const did=uuid();
+  entries.push({fullUrl:"urn:uuid:"+did,resource:{resourceType:"DocumentReference",id:did,status:"current",docStatus:"preliminary",
+    type:{coding:[{system:"http://loinc.org",code:"10164-2",display:"History of Present illness Narrative"}]},
+    subject:{reference:pref}, author:[author], date:now, description:"AI-assisted transcription of patient narrative into clinical language; patient-reported, no assessment; requires clinician review",
+    content:[{attachment:{contentType:"text/plain; charset=utf-8",data:b64(narrative),title:"HPI (patient narrative, AI-assisted)"}}]}});
+  return {resourceType:"Bundle",id:uuid(),type:"collection",timestamp:now,entry:entries};
+}
+
+/* ---------- Handoff ---------- */
+function handoffText(){
+  const r=state.result;
+  const log = LOG.length ? `\n\nEpisodes I logged between visits:\n${LOG.map(e=>`- ${fmtWhen(e.at)}: ${e.chiefComplaint}`).join("\n")}` : "";
+  return `I'm getting ready to talk with my doctor. Below is a record of what I've been experiencing. Please help me organize it and point out any details my doctor will likely want that I haven't described yet. If my health records are connected, add relevant history and current medications as plain facts. Please don't diagnose me or suggest treatment.
+
+Chief complaint: ${r.chiefComplaint}
+
+Where it hurts:
+${sitesText()}
+
+History of present illness: ${r.hpi}${log}`;
+}
+
+function syncHandoff(){
+  const t=encodeURIComponent(handoffText());
+  $("go-chatgpt").href="https://chatgpt.com/?q="+t;
+  $("go-claude").href="https://claude.ai/new?q="+t;
+}
+async function copy(text,statusNode,msg){
+  try{ await navigator.clipboard.writeText(text); statusNode.textContent=msg; }
+  catch(e){ statusNode.textContent="Couldn't copy automatically. The text is selected in the story box; press Ctrl/Cmd + C."; const ta=$("story"); const old=ta.value; ta.value=text; ta.select(); setTimeout(()=>{},0); ta.addEventListener("blur",()=>{ if(ta.value===text) ta.value=old; },{once:true}); }
+}
+["go-chatgpt","go-claude","go-gemini"].forEach(id=>$(id).addEventListener("click",()=>{ navigator.clipboard&&navigator.clipboard.writeText(handoffText()).then(()=>{$("copy-status").textContent="Summary copied. Paste it if the app didn't prefill it.";}).catch(()=>{}); }));
+$("b-copy").onclick=()=>copy(doctorText(),$("copy-status"),"Summary copied. Paste it into an email, patient portal message, or document.");
+
+/* ---------- Patient details (kept in this browser only) ---------- */
+const WHO_KEY="kmh-who-v1";
+const ROLE_LABEL={patient:"The patient",caregiver:"Caregiver",family:"Family member",guardian:"Parent or guardian",other:"Other"};
+function readWho(){ return { name:$("pt-name").value.trim(), dob:$("pt-dob").value, role:$("by-role").value, byName:$("by-name").value.trim() }; }
+function whoPatientName(){ const w=readWho(); return w.name || ($("use-record").checked ? RECORD.name : ""); }
+function whoDob(){ const w=readWho(); if(w.dob){ const [y,m,d]=w.dob.split("-"); return `${m}/${d}/${y}`; } return $("use-record").checked ? "03/14/1968" : ""; }
+function whoDobIso(){ const w=readWho(); return w.dob || ($("use-record").checked ? RECORD.birthDate : ""); }
+function whoCompletedBy(){ const w=readWho(); if(w.role==="patient") return "The patient"; return ROLE_LABEL[w.role] + (w.byName?`: ${w.byName}`:""); }
+function syncWho(){ $("by-name-wrap").hidden = $("by-role").value==="patient"; try{ localStorage.setItem(WHO_KEY, JSON.stringify(readWho())); }catch(e){} syncHandoff(); }
+(()=>{ try{ const w=JSON.parse(localStorage.getItem(WHO_KEY)||"null"); if(w){ $("pt-name").value=w.name||""; $("pt-dob").value=w.dob||""; $("by-role").value=ROLE_LABEL[w.role]?w.role:"patient"; $("by-name").value=w.byName||""; } }catch(e){}
+  $("by-name-wrap").hidden = $("by-role").value==="patient";
+  ["pt-name","pt-dob","by-role","by-name"].forEach(id=>{ $(id).addEventListener("input",syncWho); $(id).addEventListener("change",syncWho); }); })();
+
+/* ---------- Visit summary: plain text and printable PDF ---------- */
+function answeredLines(){ return (state.result.followUps||[]).filter(q=>(answers[q]||"").trim()).map(q=>`- ${q} ${answers[q].trim()}`); }
+function doctorText(){
+  const r=state.result, story=$("story").value.trim(), ans=answeredLines();
+  const rec=$("use-record").checked ? `\n\nFrom my health record:\nConditions: ${RECORD.conditions.join("; ")}\nMedications: ${RECORD.meds.join("; ")}\nAllergies: ${RECORD.allergies.join("; ")}` : "";
+  const log=LOG.length ? `\n\nEpisodes between visits:\n${LOG.map(e=>`- ${fmtWhen(e.at)}: ${e.chiefComplaint}`).join("\n")}` : "";
+  return `SYMPTOM SUMMARY FOR MY DOCTOR (patient-reported) - ${fmtWhen(new Date().toISOString())}
+Patient: ${whoPatientName()||"(not entered)"}${whoDob()?`   Date of birth: ${whoDob()}`:""}
+Completed by: ${whoCompletedBy()}
+
+Chief complaint: ${r.chiefComplaint}
+
+Where it hurts (0-10):
+${sitesText()}
+
+In my own words:
+"${story}"
+
+History of present illness: ${r.hpi}${ans.length?`\n\nMore details:\n${ans.join("\n")}`:""}${log}${rec}
+
+Patient-reported information, prepared with AI assistance. Not a diagnosis or treatment plan.`;
+}
+function hslRgb(h,s,l){ s/=100; l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l), f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1))); return [f(0),f(8),f(4)].map(v=>Math.round(v*255)); }
+function heatRgb(sev){ return hslRgb((42-(sev/10)*67+360)%360, 82, 60-sev*1.5); }
+function shapeStr(sh, attrs){
+  const tf = sh.tf ? ` transform="${sh.tf}"` : "";
+  if(sh.t==="p") return `<path d="${sh.d}"${tf} ${attrs}/>`;
+  if(sh.t==="r") return `<rect x="${sh.x}" y="${sh.y}" width="${sh.w}" height="${sh.h}" rx="${sh.rx}"${tf} ${attrs}/>`;
+  return `<circle cx="${sh.cx}" cy="${sh.cy}" r="${sh.r}"${tf} ${attrs}/>`;
+}
+function itemsSVG(items, mirrorW, viewBox, sw){
+  const body = items.map(it=>{
+    let a;
+    if(it.deco){ if(it.cls!=="crease") return ""; a=`fill="none" stroke="#8C97A8" stroke-width="${sw}" opacity=".5"`; }
+    else { const sev=sevFor(it.id,it.agg); const fill = sev!=null ? `rgb(${heatRgb(sev).join(",")})` : (it.joint?"#FFFFFF":"#E3E7EE"); a=`fill="${fill}" stroke="#7E8AA0" stroke-width="${sw}" stroke-linejoin="round"`; }
+    const s = shapeStr(it.sh, a);
+    return it.mir ? `<g transform="matrix(-1 0 0 1 ${mirrorW} 0)">${s}</g>` : s;
+  }).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${body}</svg>`;
+}
+function svgToPng(svgStr, w, h){
+  return new Promise((res,rej)=>{ const img=new Image();
+    img.onload=()=>{ const c=document.createElement("canvas"); c.width=w; c.height=h; const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h); res(c.toDataURL("image/png")); };
+    img.onerror=()=>rej(new Error("render")); img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svgStr); });
+}
+async function buildPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"pt", format:"letter"});
+  const PW=612, PH=792, M=48, W=PW-2*M; let y=M;
+  const r=state.result, story=$("story").value.trim();
+  const clean=t=>String(t).replace(/→/g,"->").replace(/[‘’]/g,"'").replace(/[“”]/g,'"').replace(/[–—]/g,"-").replace(/…/g,"...").replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,"");
+  const ink=()=>doc.setTextColor(22,32,46), muted=()=>doc.setTextColor(90,102,118);
+  const ensure=h=>{ if(y+h>PH-M-14){ doc.addPage(); y=M; } };
+  const P=(t,o={})=>{ doc.setFont("helvetica",o.style||"normal"); doc.setFontSize(o.size||10.5); o.muted?muted():ink();
+    doc.splitTextToSize(clean(t), o.width||W).forEach(l=>{ ensure(14); doc.text(l, o.x||M, y); y+=o.lh||14; }); };
+  const H=t=>{ ensure(40); y+=10; doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(17,17,17); doc.text(clean(t).toUpperCase(), M, y); y+=6; doc.setDrawColor(216,172,84); doc.setLineWidth(1.6); doc.line(M,y,M+46,y); doc.setDrawColor(226,224,220); doc.setLineWidth(.6); doc.line(M+48,y,M+W,y); y+=16; ink(); };
+  const box=(x,yy)=>{ doc.setDrawColor(90,102,118); doc.setLineWidth(.8); doc.rect(x,yy-8,9,9); };
+
+  // Header
+  doc.setFillColor(0,0,0); doc.rect(0,0,PW,30,"F"); doc.setFillColor(216,172,84); doc.rect(0,30,PW,3,"F");
+  doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(216,172,84); doc.text("KNOW MY HEALTH", M, 19);
+  doc.setTextColor(245,245,242); doc.setFont("helvetica","normal"); doc.text("Patient-reported symptom summary", PW-M, 19, {align:"right"});
+  y=M+18; doc.setFont("helvetica","bold"); doc.setFontSize(18); ink(); doc.text("SYMPTOM SUMMARY FOR MY DOCTOR", M, y); y+=18;
+  P(`Patient-reported. Prepared ${fmtWhen(new Date().toISOString())} with Know My Health.`, {muted:true, size:9.5}); y+=6;
+  doc.setFontSize(10.5); doc.setFont("helvetica","normal"); ink();
+  const nm=whoPatientName(), dob=whoDob();
+  doc.setFont("helvetica","bold"); doc.text("Patient:", M, y); doc.setFont("helvetica","normal");
+  doc.text(clean(nm || "______________________________"), M+48, y);
+  doc.setFont("helvetica","bold"); doc.text("Date of birth:", M+300, y); doc.setFont("helvetica","normal");
+  doc.text(clean(dob || "______________"), M+378, y);
+  y+=18; doc.setFont("helvetica","bold"); doc.text("Completed by:", M, y); doc.setFont("helvetica","normal");
+  doc.text(clean(whoCompletedBy()), M+80, y); y+=22;
+  doc.setFont("helvetica","bold"); doc.text("Main concern:", M, y); doc.setFont("helvetica","normal");
+  const cc=doc.splitTextToSize(clean(r.chiefComplaint), W-80); cc.forEach((l,i)=>{ doc.text(l, M+80, y); y+=14; }); y+=8;
+
+  // Body maps + marked areas
+  H("Where it hurts");
+  const imgW=118, imgH=Math.round(imgW*414/132), top=y+12;
+  const scale=4;
+  for(const [i,view] of [[0,"front"],[1,"back"]]){
+    const png = await svgToPng(itemsSVG(VIEWS[view],200,"34 2 132 414",.6), imgW*scale, imgH*scale);
+    const x = M + i*(imgW+12);
+    doc.setFont("helvetica","bold"); doc.setFontSize(8); muted();
+    doc.text(view==="front"?"FRONT":"BACK", x+imgW/2, top-4, {align:"center"});
+    doc.setFont("helvetica","normal"); doc.text(view==="front"?"R":"L", x+2, top+8); doc.text(view==="front"?"L":"R", x+imgW-6, top+8);
+    doc.addImage(png, "PNG", x, top, imgW, imgH);
+  }
+  const lx = M + 2*imgW + 34, lw = M+W-lx; let ly = top;
+  const ids = Object.keys(state.sites).sort((a,b)=>state.sites[b].severity-state.sites[a].severity);
+  doc.setFont("helvetica","bold"); doc.setFontSize(9); muted(); doc.text("AREA / PAIN 0-10 / FEELS LIKE", lx, ly); ly+=16;
+  if(!ids.length){ doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text("No areas marked.", lx, ly); ly+=14; }
+  ids.forEach(id=>{
+    const s=state.sites[id], c=heatRgb(s.severity);
+    doc.setFillColor(c[0],c[1],c[2]); doc.circle(lx+4, ly-3.5, 4, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(10); ink();
+    const nm=doc.splitTextToSize(clean(REGIONS[id].label), lw-50); nm.forEach((l,i)=>{ doc.text(l, lx+14, ly); if(i===0){ doc.text(`${s.severity}/10`, lx+lw, ly, {align:"right"}); } ly+=13; });
+    if(s.qualities.length){ doc.setFont("helvetica","normal"); doc.setFontSize(9.5); muted(); doc.splitTextToSize(s.qualities.join(", ").toLowerCase(), lw-14).forEach(l=>{ doc.text(l, lx+14, ly); ly+=12; }); }
+    ly+=6;
+  });
+  // Close-ups for any hand or foot with marks: in the right column if they fit, else a row below
+  const groups = ["hand-R","hand-L","foot-R","foot-L"].filter(g=>Object.keys(state.sites).some(k=>k.startsWith(g+"-")));
+  const cw=112, ch=Math.round(cw*212/170), rows=Math.ceil(groups.length/2);
+  const inColumn = groups.length && (ly+8 + rows*(ch+18) <= top+imgH);
+  y = Math.max(top+imgH, ly) + 10;
+  if(inColumn){
+    for(const [i,g] of groups.entries()){
+      const [grp,s]=g.split("-");
+      const items=(grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
+      const png=await svgToPng(itemsSVG(items,170,"0 0 170 212",1.2), cw*scale, ch*scale);
+      const x=lx+(i%2)*(cw+14), yy=ly+8+Math.floor(i/2)*(ch+18);
+      doc.addImage(png,"PNG",x,yy,cw,ch);
+      doc.setFont("helvetica","normal"); doc.setFontSize(8); muted();
+      doc.text(`${SIDEW(s)} ${grp==="hand"?"hand, palm up":"foot, from above"}`, x+cw/2, yy+ch+10, {align:"center"});
+    }
+  } else if(groups.length){
+    const rw=86, rh=Math.round(rw*212/170); ensure(rh+26);
+    for(const [i,g] of groups.entries()){
+      const [grp,s]=g.split("-");
+      const items=(grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
+      const png=await svgToPng(itemsSVG(items,170,"0 0 170 212",1.2), rw*scale, rh*scale);
+      const x=M+i*(rw+40);
+      doc.addImage(png,"PNG",x,y,rw,rh);
+      doc.setFont("helvetica","normal"); doc.setFontSize(8); muted();
+      doc.text(`${SIDEW(s)} ${grp==="hand"?"hand, palm up":"foot, from above"}`, x+rw/2, y+rh+10, {align:"center"});
+    }
+    y += rh + 24;
+  }
+
+  H("In my own words");
+  P(story ? `"${story}"` : "(No story entered.)", {style:"italic"});
+
+  H("Clinical summary (for review)");
+  P(`History of present illness: ${r.hpi}`); y+=4;
+  [["Onset","onset"],["Provokes / relieves","provocation"],["Quality","quality"],["Region / radiation","region"],["Severity","severity"],["Timing","timing"],["Associated","associated"]].forEach(([t,k])=>{ if(r.opqrst[k]) P(`${t}: ${r.opqrst[k]}`, {size:10}); });
+
+  H("Questions my doctor may ask");
+  P("Answers typed in the app are filled in. Write in any others before or during the visit.", {muted:true, size:9});
+  y+=2;
+  (r.followUps||[]).forEach(q=>{
+    P(`- ${q}`, {size:10});
+    const a=(answers[q]||"").trim();
+    if(a) P(`Answer: ${a}`, {x:M+12, width:W-12, size:10, style:"bold"});
+    else { ensure(20); doc.setDrawColor(200,206,214); doc.setLineWidth(.6); doc.line(M+12, y+4, M+W, y+4); y+=18; }
+    y+=2;
+  });
+
+  if(LOG.length){
+    H("Episodes between visits");
+    LOG.forEach(e=>{ P(`${fmtWhen(e.at)}: ${e.chiefComplaint}`, {style:"bold", size:10});
+      const ss=e.sites.map(x=>REGIONS[x.id]?`${REGIONS[x.id].label} ${x.severity}/10`:"").filter(Boolean).join("; ");
+      if(ss) P(ss, {size:9.5, muted:true}); if(e.note) P(e.note, {size:9.5}); y+=4; });
+  }
+  if($("use-record").checked){
+    H("From my health record");
+    P(`Conditions: ${RECORD.conditions.join("; ")}`, {size:10}); P(`Medications: ${RECORD.meds.join("; ")}`, {size:10}); P(`Allergies: ${RECORD.allergies.join("; ")}`, {size:10});
+    P("Fictional demo record.", {muted:true, size:9});
+  }
+
+  const n=doc.getNumberOfPages();
+  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFont("helvetica","normal"); doc.setFontSize(7.5); muted();
+    doc.text("Patient-reported information, prepared with AI assistance. Not a diagnosis or treatment plan. Please review with the patient.", M, PH-28);
+    doc.text(`Page ${i} of ${n}`, PW-M, PH-28, {align:"right"}); }
+  return doc;
+}
+$("b-pdf").onclick=async()=>{
+  const st=$("copy-status"), btn=$("b-pdf");
+  if(!window.jspdf){ st.textContent="The PDF tool didn't load. Use Copy summary and paste it into a document instead."; return; }
+  btn.disabled=true; st.textContent="Preparing your summary…";
+  try{
+    const doc=await buildPDF(), name=`know-my-health-summary-${new Date().toISOString().slice(0,10)}.pdf`;
+    await saveFile(name, doc.output("blob")); st.textContent="Saved. Open the PDF to print it or show it on your phone.";
+  }catch(e){ st.textContent = e&&e.code==="declined" ? "Download cancelled." : "Couldn't create the PDF here. Use Copy summary instead."; }
+  finally{ btn.disabled=false; }
+};
+
+
+/* ---------- Init ---------- */
+$("story").value=SAMPLE_STORY;
+redraw(); renderResult();
+})();
+</script>
+</body>
+</html>
