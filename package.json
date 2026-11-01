@@ -1,0 +1,8 @@
+{
+  "name": "know-my-health",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Patient-facing symptom storytelling demo: body map + narrative to clinician-ready record and FHIR R4.",
+  "type": "module",
+  "engines": { "node": ">=18" }
+}
