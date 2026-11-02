@@ -17,9 +17,9 @@ body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%
    Brand: Teresa Younkin black / white / gold. Montserrat uppercase heads, Source Sans 3 body, square corners, gold accents. Single light theme. */
 :root{
   color-scheme:light;
-  --bg:#FAF9F7; --panel:#FFFFFF; --ink:#1A1A1A; --muted:#5A5A5A; --line:#E2E0DC;
+  --bg:#FAF9F7; --panel:#FFFFFF; --ink:#1A1A1A; --muted:#4A4A4A; --line:#D6D2CA; --edge:#767676;
   --accent:#111111; --accent-soft:#EDEDEA; --skin:#E9E6E0; --skin-hover:#D9D3C7;
-  --gold:#D8AC54; --gold-deep:#8A6A1E; --night:#000000; --cream:#F5F5F2;
+  --gold:#D8AC54; --gold-deep:#7A5C12; --night:#000000; --cream:#F5F5F2;
   --chart:#FAF9F7; --chart-rule:#ECE9E3; --ok:#1F7A4D; --warn:#8A5A00; --crit:#B3122E;
   --warn-soft:#FBF1DC; --crit-soft:#FBE6E8;
   --f-display:"Montserrat", "Helvetica Neue", Arial, sans-serif;
@@ -219,9 +219,83 @@ header.hero .lede{color:var(--cream);font-weight:600}
 .k{display:inline-block;font-family:var(--f-display);font-weight:700;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--gold);color:var(--gold);padding:1px 6px;margin:1px 0;white-space:nowrap;line-height:1.5}
 .region{stroke:#B9B1A2}
 .region.joint{stroke:#6E675B}
+
+/* ---------- Accessibility layer (Section 508 / WCAG 2.0 AA) ----------
+   Light, high-contrast hero; larger type throughout; sentence-case labels; visible black focus rings;
+   3:1 borders on every control; 44px minimum touch targets. */
+body{font-size:19px;line-height:1.65}
+.skip{position:absolute;left:12px;top:-60px;z-index:20;background:var(--ink);color:#fff;padding:12px 16px;font-weight:700;text-decoration:none}
+.skip:focus{top:12px}
+main:focus{outline:none}
+.foot-wrap{padding-block:0 48px}
+
+/* Hero: white page, black type, gold used only as fills and rules */
+header.hero{background:var(--panel);color:var(--ink);border-top:10px solid var(--night);border-bottom:6px solid var(--gold)}
+header.hero .eyebrow{color:var(--gold-deep);font-size:.9rem}
+header.hero h1{color:var(--ink)}
+header.hero h1 span{color:var(--gold-deep)}
+header.hero .thesis{color:var(--ink);font-size:clamp(1.2rem,2.2vw,1.45rem)}
+header.hero .thesis .data{color:var(--ink);background:var(--gold);border-color:var(--gold);padding:0 6px}
+header.hero .lede{color:var(--ink);font-size:1.1rem}
+.how-title{color:var(--ink);font-size:1.05rem;letter-spacing:.08em}
+.how{gap:20px 36px}
+.how li{color:var(--ink);font-size:1.08rem;line-height:1.6;grid-template-columns:36px minmax(0,1fr)}
+.how li::before{width:36px;height:36px;font-size:1.05rem;background:var(--gold);color:var(--night)}
+.how b{color:var(--ink)}
+.k{font-family:var(--f-body);font-size:.95rem;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink);background:#F2EFE8;border:1px solid var(--edge);padding:0 7px;white-space:normal}
+
+/* Readable sizes and sentence case for labels and controls */
+h2{font-size:1.25rem}
+.editor h3{font-size:1.15rem}
+.step{font-size:.95rem;color:var(--gold-deep);letter-spacing:.06em}
+.eyebrow{font-size:.85rem;color:var(--muted);letter-spacing:.06em}
+.note,.hint,.status,.sites li,.fld,.record,.detail-cap{font-size:1rem}
+.status{font-family:var(--f-body)}
+.side-tag{font-size:.8rem;color:var(--ink);font-weight:600}
+.sev-scale{font-size:.9rem;color:var(--muted)}
+.sev-num{font-size:1.3rem}
+.btn{font-family:var(--f-body);font-size:1.02rem;font-weight:700;letter-spacing:0;text-transform:none;min-height:48px;padding:10px 20px}
+.seg button{font-family:var(--f-body);font-size:.98rem;font-weight:700;letter-spacing:0;text-transform:none;min-height:44px;padding:6px 14px;color:var(--ink)}
+.seg{border-color:var(--edge)}
+.zoom button{font-size:.95rem}
+.chip{font-size:1rem;min-height:44px;padding:8px 14px;border-color:var(--edge);color:var(--ink)}
+.tab{font-family:var(--f-body);font-size:1.02rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--muted);min-height:48px}
+.tab[aria-selected="true"]{color:var(--ink);font-weight:700}
+.tab .cnt{color:var(--ink);font-weight:700}
+.badge{font-size:.85rem;color:var(--warn)}
+.sub{font-size:1.05rem}
+.linkish{font-size:1rem;min-height:44px}
+textarea{font-size:1.1rem;border-color:var(--edge);background:var(--panel)}
+textarea::placeholder,.who input::placeholder,.fup input::placeholder{color:#6B6B6B}
+.who input,.who select,.fup input{font-size:1.05rem;border-color:var(--edge);min-height:46px}
+.record,.mapbox{border-color:var(--edge)}
+.panel{border-color:var(--line)}
+.sites li{min-height:44px;flex-wrap:wrap;row-gap:2px}
+.sites .q{white-space:normal;overflow:visible;text-overflow:clip;flex:1 1 140px}
+.voice{font-size:1.15rem}
+.chart{font-size:.98rem}
+.code{font-size:.85rem}
+.xlate{font-size:1rem}
+.xlate th{font-size:.85rem;color:var(--muted)}
+.xlate td:last-child{font-size:.95rem}
+.flag p{color:var(--ink)}
+.log .when{font-size:.9rem;color:var(--muted)}
+.log-sites{font-size:.98rem}
+footer{font-size:1rem;color:var(--muted)}
+.toggle{font-size:1rem}
+.toggle input{width:22px;height:22px}
+.record{display:grid;gap:8px}
+.record summary{cursor:pointer;font-weight:600;text-decoration:underline;min-height:32px;display:inline-flex;align-items:center;list-style:revert}
+input[type=range]{height:32px}
+
+/* Focus: thick black ring with white halo, visible on every background */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.sites li:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--ink)!important;outline-offset:3px;box-shadow:0 0 0 6px #fff}
+.region:focus-visible{stroke:var(--ink);stroke-width:2.5}
+@media (forced-colors:active){.btn,.chip,.seg button,.tab{border:2px solid ButtonText}.region{stroke:CanvasText}}
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to the body map</a>
 <header class="hero">
   <div class="hero-in">
     <span class="eyebrow">Interactive demo · Mosaic Life Tech</span>
@@ -245,7 +319,7 @@ header.hero .lede{color:var(--cream);font-weight:600}
     </ol>
   </div>
 </header>
-<div class="wrap">
+<main class="wrap" id="main" tabindex="-1">
 
   <div class="work">
     <!-- BODY -->
@@ -311,11 +385,10 @@ header.hero .lede{color:var(--cream);font-weight:600}
         <textarea id="story" placeholder="When did it start? What were you doing? What makes it better or worse? What worries you?"></textarea>
         <p class="note" id="mic-note">Talk the way you would to a friend. Details like "worse in the car" or "like a toothache" are exactly what helps.</p>
 
-        <details class="record" id="record">
-          <summary>
-            <label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" id="use-record" checked> Include sample health record</label>
-            <span class="note">(fictional patient · view)</span>
-          </summary>
+        <div class="record">
+          <label class="toggle"><input type="checkbox" id="use-record" checked> Include sample health record (fictional patient)</label>
+          <details id="record">
+          <summary>Show the sample record</summary>
           <dl>
             <dt>Patient</dt><dd>Maria Alvarez (fictional), 58, female</dd>
             <dt>Conditions</dt><dd>Hypertension; type 2 diabetes; high cholesterol</dd>
@@ -325,6 +398,7 @@ header.hero .lede{color:var(--cream);font-weight:600}
           </dl>
           <p class="note">Stands in for the records a patient can connect in a consumer AI app. Turn it off to see the translation from the story alone.</p>
         </details>
+        </div>
 
         <div class="row">
           <button type="button" class="btn primary" id="b-go">Translate my story</button>
@@ -371,15 +445,17 @@ header.hero .lede{color:var(--cream);font-weight:600}
         <div class="sub">Continue with your own records</div>
         <p class="note">If you've connected your health records in a consumer AI app, take this record there to add your history and current medications. The prompt asks the app not to diagnose or suggest treatment. ChatGPT and Claude open with it prefilled; for Gemini, it's copied so you can paste it.</p>
         <div class="apps">
-          <a class="btn" id="go-chatgpt" target="_blank" rel="noopener" href="https://chatgpt.com/">Open in ChatGPT</a>
-          <a class="btn" id="go-claude" target="_blank" rel="noopener" href="https://claude.ai/new">Open in Claude</a>
-          <a class="btn" id="go-gemini" target="_blank" rel="noopener" href="https://gemini.google.com/app">Open in Gemini</a>
+          <a class="btn" id="go-chatgpt" target="_blank" rel="noopener" href="https://chatgpt.com/">Open in ChatGPT<span class="sr"> (opens in a new tab)</span></a>
+          <a class="btn" id="go-claude" target="_blank" rel="noopener" href="https://claude.ai/new">Open in Claude<span class="sr"> (opens in a new tab)</span></a>
+          <a class="btn" id="go-gemini" target="_blank" rel="noopener" href="https://gemini.google.com/app">Open in Gemini<span class="sr"> (opens in a new tab)</span></a>
         </div>
         <p class="status" id="copy-status" aria-live="polite"></p>
       </section>
     </div>
   </div>
 
+  </main>
+<div class="wrap foot-wrap">
   <footer>
     <span>A demonstration that records what you report. It does not diagnose, give medical advice, or recommend treatment. If you think you're having an emergency, call 911 or your local emergency number.</span>
     <span>Nothing is stored. Your story goes to Claude only when you press Translate, using your own Claude account. SNOMED CT and LOINC codes are illustrative and should be validated before clinical use.</span>
@@ -876,7 +952,7 @@ function renderResult(){
   const r=state.result; $("ex-badge").hidden=!state.isExample;
   const tabs=$("tabs"); tabs.textContent="";
   TABS.forEach(([k,label])=>{
-    const b=el("button","tab",label); b.type="button"; b.setAttribute("role","tab"); b.setAttribute("aria-selected",state.tab===k); b.id="tab-"+k;
+    const b=el("button","tab",label); b.type="button"; b.setAttribute("role","tab"); b.setAttribute("aria-selected",state.tab===k); b.setAttribute("aria-controls","pane"); b.id="tab-"+k;
     if(k==="log"){ b.appendChild(el("span","cnt",String(shownLog().length))); }
     b.onclick=()=>{ state.tab=k; renderResult(); }; tabs.appendChild(b);
   });
@@ -950,7 +1026,7 @@ function renderResult(){
     cp.onclick=()=>copy(json,st,"Copied FHIR bundle.");
     dl.onclick=async()=>{ try{ await saveFile("know-my-health-fhir-bundle.json", new Blob([json],{type:"application/fhir+json"})); st.textContent="Saved."; }catch(e){ st.textContent = e&&e.code==="declined"?"Download cancelled.":"Download isn't available here. Use Copy JSON instead."; } };
     row.append(cp,dl,st); p.appendChild(row);
-    p.appendChild(el("pre","code",json));
+    const pre=el("pre","code",json); pre.tabIndex=0; pre.setAttribute("role","region"); pre.setAttribute("aria-label","FHIR record (JSON)"); p.appendChild(pre);
   }
   syncHandoff();
 }
@@ -1194,7 +1270,7 @@ async function buildPDF(){
   }
 
   const n=doc.getNumberOfPages();
-  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFont("helvetica","normal"); doc.setFontSize(7.5); muted();
+  for(let i=1;i<=n;i++){ doc.setPage(i); doc.setFont("helvetica","normal"); doc.setFontSize(8.5); muted();
     doc.text("Patient-reported information, prepared with AI assistance. Not a diagnosis or treatment plan. Please review with the patient.", M, PH-28);
     doc.text(`Page ${i} of ${n}`, PW-M, PH-28, {align:"right"}); }
   return doc;
