@@ -210,6 +210,13 @@ h2{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-
 .fld span{font-weight:600}
 .who input,.who select{font:inherit;font-size:.95rem;color:var(--ink);background:var(--panel);border:1px solid #CFCAC1;padding:9px 10px;width:100%;box-sizing:border-box;min-width:0}
 footer{border-top:1px solid var(--line);padding-top:16px}
+header.hero .lede{color:var(--cream);font-weight:600}
+.how-title{color:var(--gold);font-size:.85rem;letter-spacing:.16em;margin-top:14px}
+.how{list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px 32px;margin:2px 0 0;padding:0}
+.how li{counter-increment:s;display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;align-items:start;color:#DADADA;font-size:.98rem;line-height:1.55}
+.how li::before{content:counter(s);display:grid;place-items:center;width:30px;height:30px;background:var(--gold);color:var(--night);font-family:var(--f-display);font-weight:800;font-size:.85rem}
+.how b{color:var(--cream);font-weight:700}
+.k{display:inline-block;font-family:var(--f-display);font-weight:700;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--gold);color:var(--gold);padding:1px 6px;margin:1px 0;white-space:nowrap;line-height:1.5}
 .region{stroke:#B9B1A2}
 .region.joint{stroke:#6E675B}
 </style>
@@ -221,7 +228,21 @@ footer{border-top:1px solid var(--line);padding-top:16px}
     <h1>Know My <span>Health</span></h1>
     <span class="bar" aria-hidden="true"></span>
     <p class="thesis"><span class="story">Patients tell stories.</span> Doctors want <span class="data">data</span>. This page translates between the two.</p>
-    <p class="lede">Touch the body to show where it hurts, then tell what happened in your own words. You get your story back in plain language, a clinician-ready history, the follow-up questions your doctor is likely to ask, a log for episodes between visits, and a FHIR record you can carry anywhere. It records; it never diagnoses or recommends treatment.</p>
+    <p class="lede">It records what you report. It never diagnoses or recommends treatment.</p>
+    <h2 class="how-title">How to use it</h2>
+    <ol class="how">
+      <li><span>The page opens with an example. To tell your own story, click <span class="k">Start fresh</span> in step 2 below.</span></li>
+      <li><span><b>Mark where it hurts.</b> In step 1, click the spot on the body. Click <span class="k">Back</span> to turn the body around. Click the same spot again to clear it.</span></li>
+      <li><span><b>Pinpoint fingers, toes, or joints.</b> Click a hand or foot on the body, or click <span class="k">R hand</span> <span class="k">L hand</span> <span class="k">R foot</span> <span class="k">L foot</span>. Then click the finger, toe, or circle (joint).</span></li>
+      <li><span><b>Say how bad it is.</b> Under the body, drag the <b>How bad, 0 to 10</b> slider. Then click every word that fits, such as <span class="k">Aching</span> or <span class="k">Burning</span>. To change an area later, click its name in <b>Marked areas</b>.</span></li>
+      <li><span><b>Tell your story.</b> In step 2, type in the box. Or click <span class="k">Speak</span>, talk, and click <span class="k">Stop listening</span> when you finish.</span></li>
+      <li><span><b>Translate it.</b> Click <span class="k">Translate my story</span>. Wait 10 to 20 seconds. Your results appear in step 3.</span></li>
+      <li><span><b>Read your results.</b> In step 3, click each tab: <span class="k">For you</span> <span class="k">Clinical note</span> <span class="k">Story → data</span> <span class="k">Doctor's questions</span>.</span></li>
+      <li><span><b>Answer the doctor's questions.</b> Click <span class="k">Doctor's questions</span>, type your answers, click <span class="k">Add my answers to the story</span>, then click <span class="k">Translate my story</span> again.</span></li>
+      <li><span><b>Fill in the summary details.</b> In step 4, type the <b>Patient name</b> and <b>Date of birth</b>. Under <b>Completed by</b>, choose who is filling this in. If it's not the patient, type that person's name.</span></li>
+      <li><span><b>Take it to the doctor.</b> Click <span class="k">Download summary (PDF)</span>. Open the file to print it, or show it on your phone at the visit.</span></li>
+      <li><span><b>Optional: log an episode between visits.</b> In step 3, click <span class="k">Between visits</span>, then <span class="k">Save today's entry</span>.</span></li>
+    </ol>
   </div>
 </header>
 <div class="wrap">
