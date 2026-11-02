@@ -11,28 +11,21 @@ body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%
 <title>Know My Health</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: two voices side by side. Left = the body (touch), right = the story (voice) which resolves into a chart (data). */
+/* Layout: black brand band on top, then two voices side by side. Left = the body (touch), right = the story (voice) which resolves into a chart (data).
+   Brand: Teresa Younkin black / white / gold. Montserrat uppercase heads, Source Sans 3 body, square corners, gold accents. Single light theme. */
 :root{
-  --bg:#EEF1F4; --panel:#FFFFFF; --ink:#16202E; --muted:#5A6676; --line:#D3D9E1;
-  --accent:#2F43B5; --accent-soft:#E4E8FA; --skin:#E3E7EE; --skin-hover:#CBD3E0;
-  --chart:#FBFCF7; --chart-rule:#E6EBDD; --ok:#1F7A4D; --warn:#A65F00; --crit:#B3122E;
-  --warn-soft:#FFF3DF; --crit-soft:#FDE7EA;
-  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
-  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme:light;
+  --bg:#FAF9F7; --panel:#FFFFFF; --ink:#1A1A1A; --muted:#5A5A5A; --line:#E2E0DC;
+  --accent:#111111; --accent-soft:#EDEDEA; --skin:#E9E6E0; --skin-hover:#D9D3C7;
+  --gold:#D8AC54; --gold-deep:#8A6A1E; --night:#000000; --cream:#F5F5F2;
+  --chart:#FAF9F7; --chart-rule:#ECE9E3; --ok:#1F7A4D; --warn:#8A5A00; --crit:#B3122E;
+  --warn-soft:#FBF1DC; --crit-soft:#FBE6E8;
+  --f-display:"Montserrat", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Source Sans 3", system-ui, sans-serif;
   --f-data:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#0F141B; --panel:#161D27; --ink:#E7ECF3; --muted:#9AA6B6; --line:#2A3443;
-  --accent:#8C9CFF; --accent-soft:#232C52; --skin:#253041; --skin-hover:#34425A;
-  --chart:#141A17; --chart-rule:#1F2A22; --ok:#5CC48E; --warn:#F0AE4E; --crit:#FF6B81;
-  --warn-soft:#2E2414; --crit-soft:#33161C; color-scheme:dark }}
-:root[data-theme="dark"]{
-  --bg:#0F141B; --panel:#161D27; --ink:#E7ECF3; --muted:#9AA6B6; --line:#2A3443;
-  --accent:#8C9CFF; --accent-soft:#232C52; --skin:#253041; --skin-hover:#34425A;
-  --chart:#141A17; --chart-rule:#1F2A22; --ok:#5CC48E; --warn:#F0AE4E; --crit:#FF6B81;
-  --warn-soft:#2E2414; --crit-soft:#33161C; color-scheme:dark }
 
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
 .wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px}
@@ -171,16 +164,67 @@ textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
 footer{margin-top:28px;font-size:.82rem;color:var(--muted);display:grid;gap:6px;max-width:80ch}
 [hidden]{display:none!important}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- Brand layer ---------- */
+body{font-size:17px;line-height:1.6}
+.wrap{padding-block:36px 56px}
+header.hero{background:var(--night);color:var(--cream);border-bottom:5px solid var(--gold);margin:0}
+.hero-in{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:44px 40px;display:grid;gap:14px}
+header.hero .eyebrow{color:var(--gold);font-family:var(--f-display);font-weight:700;letter-spacing:.16em}
+header.hero h1{font-family:var(--f-display);font-weight:800;text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(2.3rem,6vw,4.2rem);line-height:1}
+header.hero h1 span{color:var(--gold)}
+header.hero .bar{display:block;width:72px;height:5px;background:var(--gold)}
+header.hero .thesis{color:var(--cream);font-size:clamp(1.1rem,2vw,1.35rem)}
+header.hero .thesis .data{background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:0}
+header.hero .lede{color:#CFCFCF;max-width:72ch}
+h2{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-spacing:.01em;font-size:1.05rem}
+.editor h3{font-family:var(--f-display);font-weight:700}
+.step{font-family:var(--f-display);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);font-size:.72rem}
+.eyebrow{font-family:var(--f-display);font-weight:600}
+.panel{border-radius:0;border-color:var(--line);border-top:3px solid var(--night)}
+.mapbox,textarea,.record,.chart,.code,.flag,.log li,.fup input,.who input,.who select{border-radius:0}
+.btn{border-radius:0;font-family:var(--f-display);font-weight:700;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:12px 18px;border-width:2px;border-color:var(--ink);background:transparent;color:var(--ink)}
+.btn:hover{background:var(--accent-soft)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--night)}
+.btn.primary:hover{background:#E6C06A;border-color:#E6C06A}
+.btn.rec{border-color:var(--crit);color:var(--crit)}
+.seg{border-radius:0;border-color:var(--ink)}
+.seg button{border-radius:0;font-family:var(--f-display);font-weight:600;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}
+.seg button[aria-pressed="true"]{background:var(--night);color:var(--gold)}
+.chip{border-radius:0}
+.chip[aria-pressed="true"]{background:var(--night);border-color:var(--night);color:var(--gold)}
+.tab{font-family:var(--f-display);font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.tab[aria-selected="true"]{border-bottom-color:var(--gold);border-bottom-width:3px}
+.tab .cnt{color:var(--gold-deep)}
+.badge{border-radius:0;font-family:var(--f-display);font-weight:700}
+.sub{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.06em;font-size:.85rem}
+.opq dt{color:var(--gold-deep)}
+.sev-row input,.toggle input{accent-color:var(--night)}
+.linkish{color:var(--ink)}
+.chip:focus-visible,.btn:focus-visible,.seg button:focus-visible,.tab:focus-visible,.who input:focus,.who select:focus,textarea:focus{outline:3px solid var(--gold);outline-offset:2px}
+.region:focus-visible{stroke:var(--gold-deep)}
+.who{border:1px solid var(--line);margin:0;padding:14px 16px 12px;display:grid;gap:10px;background:var(--bg)}
+.who legend{font-family:var(--f-display);font-weight:700;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;padding:0 6px}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.fld{display:grid;gap:5px;font-size:.88rem;min-width:0}
+.fld span{font-weight:600}
+.who input,.who select{font:inherit;font-size:.95rem;color:var(--ink);background:var(--panel);border:1px solid #CFCAC1;padding:9px 10px;width:100%;box-sizing:border-box;min-width:0}
+footer{border-top:1px solid var(--line);padding-top:16px}
+.region{stroke:#B9B1A2}
+.region.joint{stroke:#6E675B}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="hero">
+<header class="hero">
+  <div class="hero-in">
     <span class="eyebrow">Interactive demo · Mosaic Life Tech</span>
-    <h1>Know My Health</h1>
+    <h1>Know My <span>Health</span></h1>
+    <span class="bar" aria-hidden="true"></span>
     <p class="thesis"><span class="story">Patients tell stories.</span> Doctors want <span class="data">data</span>. This page translates between the two.</p>
     <p class="lede">Touch the body to show where it hurts, then tell what happened in your own words. You get your story back in plain language, a clinician-ready history, the follow-up questions your doctor is likely to ask, a log for episodes between visits, and a FHIR record you can carry anywhere. It records; it never diagnoses or recommends treatment.</p>
-  </header>
+  </div>
+</header>
+<div class="wrap">
 
   <div class="work">
     <!-- BODY -->
@@ -282,6 +326,23 @@ footer{margin-top:28px;font-size:.82rem;color:var(--muted);display:grid;gap:6px;
       <section class="panel handoff" aria-labelledby="h-hand">
         <div><div class="step">4 · Carry it forward</div><h2 id="h-hand">Take it to your doctor</h2></div>
         <p class="note">Download a one-to-two page summary to print or show on your phone: body maps with your marks, your story in your own words, the clinical history, the questions your doctor may ask (with space to write answers), and any episodes you logged. A caregiver can bring it on your behalf.</p>
+        <fieldset class="who">
+          <legend>About this summary</legend>
+          <div class="who-grid">
+            <label class="fld"><span>Patient name</span><input type="text" id="pt-name" autocomplete="name" placeholder="First and last name"></label>
+            <label class="fld"><span>Date of birth</span><input type="date" id="pt-dob"></label>
+            <label class="fld"><span>Completed by</span>
+              <select id="by-role">
+                <option value="patient">The patient</option>
+                <option value="caregiver">Caregiver</option>
+                <option value="family">Family member</option>
+                <option value="guardian">Parent or guardian</option>
+                <option value="other">Other</option>
+              </select></label>
+            <label class="fld" id="by-name-wrap" hidden><span>Their name</span><input type="text" id="by-name" placeholder="Name of person completing this"></label>
+          </div>
+          <p class="note">Printed at the top of the summary and included in the FHIR record. Kept only in this browser.</p>
+        </fieldset>
         <div class="apps">
           <button type="button" class="btn primary" id="b-pdf">Download summary (PDF)</button>
           <button type="button" class="btn" id="b-copy">Copy summary text</button>
@@ -879,9 +940,18 @@ function b64(s){ return btoa(unescape(encodeURIComponent(s))); }
 function buildFHIR(){
   const useRec=$("use-record").checked, now=state.generatedAt, r=state.result;
   const pid=uuid(), pref="urn:uuid:"+pid;
-  const patient = { resourceType:"Patient", id:pid, text:{status:"generated",div:'<div xmlns="http://www.w3.org/1999/xhtml">Demo patient</div>'},
-    ...(useRec?{name:[{text:RECORD.name,family:"Alvarez",given:["Maria"]}],gender:"female",birthDate:RECORD.birthDate}:{name:[{text:"Demo patient"}]}) };
+  const nmText = whoPatientName() || "Demo patient", dobIso = whoDobIso();
+  const patient = { resourceType:"Patient", id:pid, name:[{text:nmText}], ...(dobIso?{birthDate:dobIso}:{}), ...(useRec&&!readWho().name?{gender:"female"}:{}) };
   const entries=[{fullUrl:pref,resource:patient}];
+  let author = {reference:pref};
+  const w = readWho();
+  if(w.role!=="patient"){
+    const rid=uuid(), RC={family:["FAMMEMB","family member"],guardian:["GUARD","guardian"]}[w.role];
+    entries.push({fullUrl:"urn:uuid:"+rid,resource:{resourceType:"RelatedPerson",id:rid,patient:{reference:pref},
+      relationship:[RC?{coding:[{system:"http://terminology.hl7.org/CodeSystem/v3-RoleCode",code:RC[0],display:RC[1]}],text:ROLE_LABEL[w.role]}:{text:ROLE_LABEL[w.role]}],
+      ...(w.byName?{name:[{text:w.byName}]}:{})}});
+    author = {reference:"urn:uuid:"+rid};
+  }
   const obs=(id,s,when,note)=>{
     const rg=REGIONS[id]; if(!rg) return; const oid=uuid();
     const comps=[{code:{coding:[{system:"http://loinc.org",code:"72514-3",display:"Pain severity - 0-10 verbal numeric rating [Score] - Reported"}]},valueInteger:s.severity}];
@@ -890,7 +960,7 @@ function buildFHIR(){
     entries.push({fullUrl:"urn:uuid:"+oid,resource:{resourceType:"Observation",id:oid,status:"preliminary",
       category:[{coding:[{system:"http://terminology.hl7.org/CodeSystem/observation-category",code:"survey",display:"Survey"}]}],
       code:{coding:[{system:"http://snomed.info/sct",code:"22253000",display:"Pain"}],text:"Patient-reported pain"},
-      subject:{reference:pref}, effectiveDateTime:when, performer:[{reference:pref}],
+      subject:{reference:pref}, effectiveDateTime:when, performer:[author],
       bodySite:{coding:[{system:"http://snomed.info/sct",code:rg.sct}],text:rg.label},
       component:comps, note:[{text:note}]}});
   };
@@ -900,7 +970,7 @@ function buildFHIR(){
   const did=uuid();
   entries.push({fullUrl:"urn:uuid:"+did,resource:{resourceType:"DocumentReference",id:did,status:"current",docStatus:"preliminary",
     type:{coding:[{system:"http://loinc.org",code:"10164-2",display:"History of Present illness Narrative"}]},
-    subject:{reference:pref}, date:now, description:"AI-assisted transcription of patient narrative into clinical language; patient-reported, no assessment; requires clinician review",
+    subject:{reference:pref}, author:[author], date:now, description:"AI-assisted transcription of patient narrative into clinical language; patient-reported, no assessment; requires clinician review",
     content:[{attachment:{contentType:"text/plain; charset=utf-8",data:b64(narrative),title:"HPI (patient narrative, AI-assisted)"}}]}});
   return {resourceType:"Bundle",id:uuid(),type:"collection",timestamp:now,entry:entries};
 }
@@ -931,6 +1001,19 @@ async function copy(text,statusNode,msg){
 ["go-chatgpt","go-claude","go-gemini"].forEach(id=>$(id).addEventListener("click",()=>{ navigator.clipboard&&navigator.clipboard.writeText(handoffText()).then(()=>{$("copy-status").textContent="Summary copied. Paste it if the app didn't prefill it.";}).catch(()=>{}); }));
 $("b-copy").onclick=()=>copy(doctorText(),$("copy-status"),"Summary copied. Paste it into an email, patient portal message, or document.");
 
+/* ---------- Patient details (kept in this browser only) ---------- */
+const WHO_KEY="kmh-who-v1";
+const ROLE_LABEL={patient:"The patient",caregiver:"Caregiver",family:"Family member",guardian:"Parent or guardian",other:"Other"};
+function readWho(){ return { name:$("pt-name").value.trim(), dob:$("pt-dob").value, role:$("by-role").value, byName:$("by-name").value.trim() }; }
+function whoPatientName(){ const w=readWho(); return w.name || ($("use-record").checked ? RECORD.name : ""); }
+function whoDob(){ const w=readWho(); if(w.dob){ const [y,m,d]=w.dob.split("-"); return `${m}/${d}/${y}`; } return $("use-record").checked ? "03/14/1968" : ""; }
+function whoDobIso(){ const w=readWho(); return w.dob || ($("use-record").checked ? RECORD.birthDate : ""); }
+function whoCompletedBy(){ const w=readWho(); if(w.role==="patient") return "The patient"; return ROLE_LABEL[w.role] + (w.byName?`: ${w.byName}`:""); }
+function syncWho(){ $("by-name-wrap").hidden = $("by-role").value==="patient"; try{ localStorage.setItem(WHO_KEY, JSON.stringify(readWho())); }catch(e){} syncHandoff(); }
+(()=>{ try{ const w=JSON.parse(localStorage.getItem(WHO_KEY)||"null"); if(w){ $("pt-name").value=w.name||""; $("pt-dob").value=w.dob||""; $("by-role").value=ROLE_LABEL[w.role]?w.role:"patient"; $("by-name").value=w.byName||""; } }catch(e){}
+  $("by-name-wrap").hidden = $("by-role").value==="patient";
+  ["pt-name","pt-dob","by-role","by-name"].forEach(id=>{ $(id).addEventListener("input",syncWho); $(id).addEventListener("change",syncWho); }); })();
+
 /* ---------- Visit summary: plain text and printable PDF ---------- */
 function answeredLines(){ return (state.result.followUps||[]).filter(q=>(answers[q]||"").trim()).map(q=>`- ${q} ${answers[q].trim()}`); }
 function doctorText(){
@@ -938,6 +1021,8 @@ function doctorText(){
   const rec=$("use-record").checked ? `\n\nFrom my health record:\nConditions: ${RECORD.conditions.join("; ")}\nMedications: ${RECORD.meds.join("; ")}\nAllergies: ${RECORD.allergies.join("; ")}` : "";
   const log=LOG.length ? `\n\nEpisodes between visits:\n${LOG.map(e=>`- ${fmtWhen(e.at)}: ${e.chiefComplaint}`).join("\n")}` : "";
   return `SYMPTOM SUMMARY FOR MY DOCTOR (patient-reported) - ${fmtWhen(new Date().toISOString())}
+Patient: ${whoPatientName()||"(not entered)"}${whoDob()?`   Date of birth: ${whoDob()}`:""}
+Completed by: ${whoCompletedBy()}
 
 Chief complaint: ${r.chiefComplaint}
 
@@ -984,16 +1069,23 @@ async function buildPDF(){
   const ensure=h=>{ if(y+h>PH-M-14){ doc.addPage(); y=M; } };
   const P=(t,o={})=>{ doc.setFont("helvetica",o.style||"normal"); doc.setFontSize(o.size||10.5); o.muted?muted():ink();
     doc.splitTextToSize(clean(t), o.width||W).forEach(l=>{ ensure(14); doc.text(l, o.x||M, y); y+=o.lh||14; }); };
-  const H=t=>{ ensure(40); y+=10; doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(47,67,181); doc.text(clean(t).toUpperCase(), M, y); y+=6; doc.setDrawColor(211,217,225); doc.setLineWidth(.8); doc.line(M,y,M+W,y); y+=16; ink(); };
+  const H=t=>{ ensure(40); y+=10; doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(17,17,17); doc.text(clean(t).toUpperCase(), M, y); y+=6; doc.setDrawColor(216,172,84); doc.setLineWidth(1.6); doc.line(M,y,M+46,y); doc.setDrawColor(226,224,220); doc.setLineWidth(.6); doc.line(M+48,y,M+W,y); y+=16; ink(); };
   const box=(x,yy)=>{ doc.setDrawColor(90,102,118); doc.setLineWidth(.8); doc.rect(x,yy-8,9,9); };
 
   // Header
-  doc.setFont("helvetica","bold"); doc.setFontSize(18); ink(); doc.text("Symptom summary for my doctor", M, y); y+=18;
+  doc.setFillColor(0,0,0); doc.rect(0,0,PW,30,"F"); doc.setFillColor(216,172,84); doc.rect(0,30,PW,3,"F");
+  doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(216,172,84); doc.text("KNOW MY HEALTH", M, 19);
+  doc.setTextColor(245,245,242); doc.setFont("helvetica","normal"); doc.text("Patient-reported symptom summary", PW-M, 19, {align:"right"});
+  y=M+18; doc.setFont("helvetica","bold"); doc.setFontSize(18); ink(); doc.text("SYMPTOM SUMMARY FOR MY DOCTOR", M, y); y+=18;
   P(`Patient-reported. Prepared ${fmtWhen(new Date().toISOString())} with Know My Health.`, {muted:true, size:9.5}); y+=6;
   doc.setFontSize(10.5); doc.setFont("helvetica","normal"); ink();
-  if($("use-record").checked){ doc.text(clean(`Patient: ${RECORD.name}     Date of birth: 03/14/1968`), M, y); }
-  else { doc.text("Patient: ______________________________     Date of birth: ______________", M, y); }
-  y+=20; doc.text("Completed by:", M, y); box(M+76,y); doc.text("Patient", M+90, y); box(M+140,y); doc.text("Caregiver: ______________________________", M+154, y); y+=22;
+  const nm=whoPatientName(), dob=whoDob();
+  doc.setFont("helvetica","bold"); doc.text("Patient:", M, y); doc.setFont("helvetica","normal");
+  doc.text(clean(nm || "______________________________"), M+48, y);
+  doc.setFont("helvetica","bold"); doc.text("Date of birth:", M+300, y); doc.setFont("helvetica","normal");
+  doc.text(clean(dob || "______________"), M+378, y);
+  y+=18; doc.setFont("helvetica","bold"); doc.text("Completed by:", M, y); doc.setFont("helvetica","normal");
+  doc.text(clean(whoCompletedBy()), M+80, y); y+=22;
   doc.setFont("helvetica","bold"); doc.text("Main concern:", M, y); doc.setFont("helvetica","normal");
   const cc=doc.splitTextToSize(clean(r.chiefComplaint), W-80); cc.forEach((l,i)=>{ doc.text(l, M+80, y); y+=14; }); y+=8;
 
