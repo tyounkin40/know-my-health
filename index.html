@@ -55,21 +55,7 @@ header.hero{display:grid;gap:10px;margin-bottom:22px}
 .mapbox svg{display:block;width:100%;max-width:300px;height:auto;margin:0 auto}
 .side-tag{position:absolute;top:8px;font-family:var(--f-data);font-size:.68rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .side-tag.l{left:10px}.side-tag.r{right:10px}
-.region{fill:var(--skin);stroke:var(--line);stroke-width:1;cursor:pointer;transition:fill .15s}
-.region:hover{fill:var(--skin-hover)}
-.region:focus{outline:none}
-.region:focus-visible{stroke:var(--accent);stroke-width:2.5}
-.region.active{stroke:var(--ink);stroke-width:2.5}
 .hint{font-size:.85rem;color:var(--muted);margin:0}
-.region{stroke-width:.6;stroke-linejoin:round}
-#detail .region{stroke-width:1.2}
-.region.joint{fill:var(--panel);stroke:var(--muted);stroke-width:1.2}
-.region.joint:hover{fill:var(--skin-hover)}
-.region.active,#detail .region.active{stroke:var(--ink);stroke-width:2}
-#body .region.active{stroke-width:1.4}
-.deco{fill:none;stroke:var(--line);stroke-width:.7;pointer-events:none}
-.deco.solid{fill:var(--skin)}
-.crease{fill:none;stroke:var(--muted);stroke-width:.8;opacity:.45;pointer-events:none}
 .detail{display:grid;gap:10px}
 .zoom{flex-wrap:wrap;border-radius:12px;justify-self:start}
 .zoom button{font-size:.8rem;padding:4px 10px}
@@ -202,7 +188,6 @@ h2{font-family:var(--f-display);font-weight:700;text-transform:uppercase;letter-
 .sev-row input,.toggle input{accent-color:var(--night)}
 .linkish{color:var(--ink)}
 .chip:focus-visible,.btn:focus-visible,.seg button:focus-visible,.tab:focus-visible,.who input:focus,.who select:focus,textarea:focus{outline:3px solid var(--gold);outline-offset:2px}
-.region:focus-visible{stroke:var(--gold-deep)}
 .who{border:1px solid var(--line);margin:0;padding:14px 16px 12px;display:grid;gap:10px;background:var(--bg)}
 .who legend{font-family:var(--f-display);font-weight:700;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;padding:0 6px}
 .who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
@@ -217,8 +202,6 @@ header.hero .lede{color:var(--cream);font-weight:600}
 .how li::before{content:counter(s);display:grid;place-items:center;width:30px;height:30px;background:var(--gold);color:var(--night);font-family:var(--f-display);font-weight:800;font-size:.85rem}
 .how b{color:var(--cream);font-weight:700}
 .k{display:inline-block;font-family:var(--f-display);font-weight:700;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--gold);color:var(--gold);padding:1px 6px;margin:1px 0;white-space:nowrap;line-height:1.5}
-.region{stroke:#B9B1A2}
-.region.joint{stroke:#6E675B}
 
 /* ---------- Accessibility layer (Section 508 / WCAG 2.0 AA) ----------
    Light, high-contrast hero; larger type throughout; sentence-case labels; visible black focus rings;
@@ -294,8 +277,32 @@ input[type=range]{height:32px}
 
 /* Focus: thick black ring with white halo, visible on every background */
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.sites li:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--ink)!important;outline-offset:3px;box-shadow:0 0 0 6px #fff}
-.region:focus-visible{stroke:var(--ink);stroke-width:2.5}
 @media (forced-colors:active){.btn,.chip,.seg button,.tab{border:2px solid ButtonText}.region{stroke:CanvasText}}
+
+/* ---------- Illustrated body ---------- */
+.mapbox{background:#F4F1EA;background-image:none}
+#body .region,#detail .region{cursor:pointer;outline:none}
+#body .region:not(.marked):hover,#detail .region:not(.marked):not(.joint):hover{fill:#000;fill-opacity:.13}
+#detail .region.joint:not(.marked):hover{fill:#FFE9A8}
+#body .region.active{stroke:#000;stroke-width:1.3;stroke-dasharray:2 1.2}
+#detail .region.active{stroke:#000;stroke-width:2.6}
+#body .region:focus-visible{stroke:#000;stroke-width:1.6}
+#detail .region:focus-visible{stroke:#000;stroke-width:3}
+.tone-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.tones{display:flex;gap:10px;flex-wrap:wrap}
+.tone{width:40px;height:40px;border-radius:50%;border:2px solid #767676;cursor:pointer;padding:0}
+.tone[aria-checked="true"]{border:3px solid #000;box-shadow:0 0 0 3px var(--gold)}
+.btn.small{min-height:44px;padding:6px 14px;font-size:.95rem;margin-left:auto}
+.faces{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.face{display:grid;justify-items:center;gap:2px;border:2px solid transparent;background:transparent;padding:6px 2px;cursor:pointer;color:var(--ink);font:inherit;min-height:44px}
+.face svg{width:100%;max-width:56px;height:auto}
+.face .fw{font-size:.95rem;line-height:1.2;text-align:center;font-weight:600}
+.face .fn{font-size:.85rem;font-family:var(--f-data)}
+.face:hover{background:var(--accent-soft)}
+.face[aria-pressed="true"]{border-color:#000;background:#FFF6DC}
+.chip{display:inline-flex;align-items:center;gap:8px}
+.chip .qi{width:22px;height:22px;flex:none}
+.sites .n{margin-left:auto}
 </style>
 </head>
 <body>
@@ -313,9 +320,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
         <h3>Show where it hurts</h3>
         <ol class="how" start="1" style="counter-reset:s 0">
           <li><span>The page opens with an example. To tell your own story, click <span class="k">Start fresh</span> in step 2 below.</span></li>
-          <li><span><b>Mark where it hurts.</b> In step 1, click the spot on the body. Click <span class="k">Back</span> to turn the body around. Click the same spot again to clear it.</span></li>
+          <li><span><b>Mark where it hurts.</b> In step 1, tap a <b>Skin color</b> circle if you like. Then click the spot on the body. Click <span class="k">Back</span> to turn the body around. Click the same spot again to clear it.</span></li>
           <li><span><b>Pinpoint fingers, toes, or joints.</b> Click a hand or foot on the body, or click <span class="k">R hand</span> <span class="k">L hand</span> <span class="k">R foot</span> <span class="k">L foot</span>. Then click the finger, toe, or circle (joint).</span></li>
-          <li><span><b>Say how bad it is.</b> Under the body, drag the <b>How bad, 0 to 10</b> slider. Then click every word that fits, such as <span class="k">Aching</span> or <span class="k">Burning</span>. To change an area later, click its name in <b>Marked areas</b>.</span></li>
+          <li><span><b>Say how bad it is.</b> Under the body, tap the face that matches how it feels, or drag the <b>How bad, 0 to 10</b> slider. Then tap every picture that fits, such as <span class="k">Aching</span> or <span class="k">Burning</span>. To change an area later, click its name in <b>Marked areas</b>.</span></li>
         </ol>
       </div>
       <div class="how-col">
@@ -350,12 +357,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
           <button type="button" id="v-back" aria-pressed="false">Back</button>
         </div>
       </div>
+      <div class="tone-row">
+        <span class="eyebrow" id="tone-lbl">Skin color</span>
+        <div class="tones" role="radiogroup" aria-labelledby="tone-lbl" id="tones"></div>
+        <button type="button" class="btn small" id="b-speak" aria-pressed="true">Read aloud: On</button>
+      </div>
       <div class="mapbox">
         <span class="side-tag l" id="tag-l">Your right</span>
         <span class="side-tag r" id="tag-r">Your left</span>
         <svg id="body" viewBox="34 2 132 414" role="group" aria-label="Body map. Select an area to mark pain."></svg>
       </div>
-      <p class="hint" id="map-hint">Tap an area to mark it, tap again to clear it. Tap a hand or foot to zoom in on fingers, toes, and joints. To edit a marked area, pick it from the list below.</p>
+      <p class="hint" id="map-hint">Tap where it hurts to mark it. Tap the same spot again to clear it. Tap a hand or foot to choose a finger, toe, or joint. To change a marked area, tap its name in the list below.</p>
 
       <div class="detail">
         <div class="seg zoom" role="group" aria-label="Zoom in on hands and feet">
@@ -373,12 +385,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="editor" id="editor" hidden>
         <h3 id="ed-title">Area</h3>
         <div>
-          <label for="ed-sev" class="eyebrow">How bad, 0 to 10</label>
+          <div class="eyebrow" id="faces-lbl">How bad is it? Tap a face</div>
+          <div class="faces" id="faces" role="group" aria-labelledby="faces-lbl"></div>
+          <label for="ed-sev" class="eyebrow" style="display:block;margin-top:12px">Or pick an exact number: How bad, 0 to 10</label>
           <div class="sev-row"><input type="range" id="ed-sev" min="0" max="10" step="1" value="5"><span class="sev-num" id="ed-sevn">5</span></div>
           <div class="sev-scale"><span>No pain</span><span>Worst imaginable</span></div>
         </div>
         <div>
-          <div class="eyebrow" style="margin-bottom:6px">What it feels like</div>
+          <div class="eyebrow" style="margin-bottom:6px">What it feels like. Tap every picture that fits</div>
           <div class="chips" id="ed-q"></div>
         </div>
         <p class="note">Tap the area again on the body to clear it.</p>
@@ -552,7 +566,7 @@ const G = {
   knee:"M76,283 C76,291 76,298 77,305 L94,305 C94,298 94,291 95,283 Z",
   shin:"M77,305 C76,318 76,331 78,345 C80,360 81,370 82,379 L92,379 C93,366 94,351 95,336 C95,325 95,315 94,305 Z",
   ankle:"M82,379 L81,389 L94,389 L92,379 Z",
-  foottop:"M81,389 C79,395 77,400 77,404 L97,404 C97,399 96,394 94,389 Z",
+  foottop:"M81,388 C79.5,394 77,399 76.8,403 C76.7,405.5 78,406.5 80,406.5 L95.5,406.5 C97.3,406.5 98,405.2 97.7,403 C97.2,398 95.6,393 94,388 Z",
   flank:"M72,125 L86,125 L86,172 L77,172 C76,156 74,140 72,125 Z",
   lback:"M86,125 L100,125 L100,172 L86,172 Z",
   sacrum:"M86,172 L114,172 L111,190 L100,198 L89,190 Z",
@@ -608,21 +622,31 @@ function resolve(view, specs){
 const VIEWS = { front: resolve("front",FRONT), back: resolve("back",BACK) };
 
 /* Close-up geometry: patient's RIGHT hand palm up and RIGHT foot from above, as the patient sees them. Mirrored for left. */
+/* Tapered finger or toe with a rounded tip */
+function fingerPath(x,w,top,bot){
+  const t=w*0.07, k=top+w*0.48;
+  return `M${x},${bot} L${x+t},${k} C${x+t},${top-0.6} ${x+w-t},${top-0.6} ${x+w-t},${k} L${x+w},${bot} Z`;
+}
+function nail(x,w,top,tf){ return {deco:true, cls:"nail", sh:Object.assign({t:"r",x:x+w*0.24,y:top+w*0.14,w:w*0.52,h:w*0.6,rx:w*0.24},tf?{tf}:{})}; }
 function handItems(s){
   const it = [];
-  it.push({id:`hand-${s}-wrist`, sh:P("M48,172 L119,172 L114,202 L53,202 Z")});
-  it.push({id:`hand-${s}-palm`, sh:P("M38,100 L116,100 C124,118 127,146 120,172 L46,172 C40,150 36,124 38,100 Z")});
+  it.push({id:`hand-${s}-wrist`, sh:P("M50,172 L118,172 C117,182 115,193 113,204 L55,204 C53,193 51,182 50,172 Z")});
+  it.push({id:`hand-${s}-palm`, sh:P("M39,104 C38,100 40,98 44,98 L113,98 C118,98 121,102 121,108 C124,124 125,148 119,172 L50,172 C42,152 38,128 39,104 Z")});
   it.push({deco:true, sh:P("M48,128 C70,122 92,124 112,134"), cls:"crease"});
   it.push({deco:true, sh:P("M46,146 C66,140 84,146 98,160"), cls:"crease"});
+  it.push({deco:true, sh:P("M70,166 C76,150 86,140 100,134"), cls:"crease"});
   const base = 104;
   [["little",40,15,42],["ring",57,17,20],["middle",76,18,10],["index",96,17,20]].forEach(([k,x,w,top]) => {
     const L = base-top;
-    it.push({id:`hand-${s}-${k}`, sh:R(x,top,w,L+6,w/2)});
-    it.push({deco:true, cls:"crease", sh:P(`M${x+3},${top+L*0.3} H${x+w-3} M${x+3},${top+L*0.62} H${x+w-3}`)});
+    it.push({id:`hand-${s}-${k}`, sh:P(fingerPath(x,w,top,base+6))});
+    it.push(nail(x,w,top));
+    it.push({deco:true, cls:"crease", sh:P(`M${x+3},${top+L*0.3} Q${x+w/2},${top+L*0.3+1.6} ${x+w-3},${top+L*0.3} M${x+3},${top+L*0.62} Q${x+w/2},${top+L*0.62+1.8} ${x+w-3},${top+L*0.62}`)});
     [["DIP",top+L*0.3],["PIP",top+L*0.62],["MCP",base]].forEach(([j,y]) => it.push({id:`hand-${s}-${k}-${j}`, sh:{t:"c",cx:x+w/2,cy:y,r:4.6}, joint:true}));
   });
   const tf = "rotate(35 118 160)";
-  it.push({id:`hand-${s}-thumb`, sh:R(110,96,17,64,8.5,tf)});
+  it.push({id:`hand-${s}-thumb`, sh:Object.assign(P(fingerPath(109.5,18,96,164)),{tf})});
+  it.push(nail(109.5,18,96,tf));
+  it.push({deco:true, cls:"crease", sh:{t:"p",d:"M113,114 Q118.5,116 124,114",tf}});
   it.push({id:`hand-${s}-thumb-IP`, sh:{t:"c",cx:118.5,cy:114,r:4.8,tf}, joint:true});
   it.push({id:`hand-${s}-thumb-MCP`, sh:{t:"c",cx:118.5,cy:140,r:4.8,tf}, joint:true});
   it.push({id:`hand-${s}-thumb-CMC`, sh:{t:"c",cx:113,cy:166,r:4.8}, joint:true});
@@ -630,14 +654,17 @@ function handItems(s){
 }
 function footItems(s){
   const it = [];
-  it.push({id:`foot-${s}-ankle`, sh:P("M60,164 L112,164 C113,178 112,192 110,206 L62,206 C60,192 59,178 60,164 Z")});
-  it.push({id:`foot-${s}-mid`, sh:P("M46,116 L122,116 C120,134 116,150 112,164 L60,164 C58,148 52,132 46,116 Z")});
-  it.push({id:`foot-${s}-forefoot`, sh:P("M37,76 C34,90 38,104 46,116 L122,116 C128,104 132,90 130,76 Z")});
-  const base = 76;
+  it.push({id:`foot-${s}-ankle`, sh:P("M61,163 C74,160 98,160 111,163 C113,178 113,192 108,203 C98,211 74,211 64,203 C59,192 59,178 61,163 Z")});
+  it.push({id:`foot-${s}-mid`, sh:P("M44,114 L124,114 C121,132 117,148 112,164 L60,164 C57,148 50,130 44,114 Z")});
+  it.push({id:`foot-${s}-forefoot`, sh:P("M38,74 C33,88 36,104 45,116 L123,116 C130,104 133,90 129,74 Z")});
+  it.push({deco:true, cls:"crease", sh:P("M60,120 C64,134 68,146 72,158")});
+  it.push({deco:true, cls:"crease", sh:P("M86,122 C87,136 87,148 86,160")});
+  const base = 78;
   [["toe1",40,24,16,6,["IP",.45]],["toe2",67,15,20,4.4,["PIP",.5]],["toe3",84,14,28,4.2,["PIP",.5]],["toe4",100,13,38,4,["PIP",.5]],["toe5",115,12,50,3.8,["PIP",.5]]]
     .forEach(([k,x,w,top,r,[mj,f]]) => {
       const L = base-top;
-      it.push({id:`foot-${s}-${k}`, sh:R(x,top,w,L+6,w/2)});
+      it.push({id:`foot-${s}-${k}`, sh:P(fingerPath(x,w,top,base+8))});
+      it.push(nail(x,w,top));
       it.push({id:`foot-${s}-${k}-${mj}`, sh:{t:"c",cx:x+w/2,cy:top+L*f,r}, joint:true});
       it.push({id:`foot-${s}-${k}-MTP`, sh:{t:"c",cx:x+w/2,cy:base+2,r}, joint:true});
     });
@@ -701,6 +728,7 @@ const EXAMPLE = {
 const state = {
   view:"front",
   detail:null,
+  tone:"t2",
   sites: JSON.parse(JSON.stringify(SAMPLE_SITES)),
   active:null,
   result: EXAMPLE,
@@ -709,99 +737,247 @@ const state = {
   generatedAt: new Date().toISOString()
 };
 
-/* ---------- Body map ---------- */
+/* ---------- Body map: illustrated person ----------
+   Layers: skin (outline, then fill, so separate parts read as one body), soft edge shading,
+   invisible clickable regions clipped to the body, facial and anatomical details on top, joint rings last. */
 const svg = $("body"), dsvg = $("detail");
-const NS = "http://www.w3.org/2000/svg";
 function heat(sev){ const h = 42 - (sev/10)*67; return `hsl(${(h+360)%360} 82% ${60 - sev*1.5}%)`; }
 function sevFor(id, agg){
   if(!agg) return state.sites[id] ? state.sites[id].severity : null;
   let m=null; Object.keys(state.sites).forEach(k=>{ if(k===id||k.startsWith(id+"-")) m=Math.max(m??0,state.sites[k].severity); }); return m;
 }
-function mkShape(sh){
-  let el;
-  if(sh.t==="p"){ el=document.createElementNS(NS,"path"); el.setAttribute("d",sh.d); }
-  else if(sh.t==="r"){ el=document.createElementNS(NS,"rect"); ["x","y","rx"].forEach(a=>el.setAttribute(a,sh[a])); el.setAttribute("width",sh.w); el.setAttribute("height",sh.h); }
-  else { el=document.createElementNS(NS,"circle"); el.setAttribute("cx",sh.cx); el.setAttribute("cy",sh.cy); el.setAttribute("r",sh.r); }
-  if(sh.tf) el.setAttribute("transform",sh.tf);
-  return el;
+const TONES=[
+  {k:"t1",name:"Light",fill:"#F6D7C3",line:"#B4826A",hair:"#4A3426"},
+  {k:"t2",name:"Light medium",fill:"#E8BB96",line:"#A06F4C",hair:"#3B2A1F"},
+  {k:"t3",name:"Medium",fill:"#C68E66",line:"#7E5236",hair:"#2C1F18"},
+  {k:"t4",name:"Medium dark",fill:"#93603F",line:"#573520",hair:"#1F1510"},
+  {k:"t5",name:"Dark",fill:"#5E3C28",line:"#2E1B10",hair:"#120C08"},
+];
+function tone(){ return TONES.find(t=>t.k===state.tone) || TONES[1]; }
+
+/* Body outline, viewer-left half as cubic segments from the top of the head to the crotch; the right half is mirrored. */
+const SIL_L=[
+  [88,7,80,17,80,30],[80,40,83,48,88,53],[90,55,91,57,91,60],[91,64,90.5,68,89,70],
+  [83,73,72,74,64,78],[56,82,52.5,92,53,104],[52,118,50.5,134,50.5,148],[50.5,152,49.5,156,49.5,160],
+  [48,175,46.5,190,46,201],[48,202.5,54,202.5,56,201],[57,190,60,175,62.5,161],[63.5,155,64,152,64.5,149],
+  [66,135,68,120,70.5,107],[71,114,71.5,119,72.5,126],[74,138,77,148,77,160],[77,172,70,182,70,196],
+  [70,215,72,250,76,284],[76.5,292,76,298,76.5,306],[75,320,75,334,78,348],[80,362,81.5,372,82,380],
+  [84,386,91,386,93,380],[93.5,366,95,350,95.5,336],[96,322,94.5,312,94.5,305],[94,296,94.5,289,95.5,282],
+  [97,258,98.5,236,100,216]
+];
+function silPath(){
+  let d="M100,7";
+  SIL_L.forEach(s=>{ d+=` C${s[0]},${s[1]} ${s[2]},${s[3]} ${s[4]},${s[5]}`; });
+  for(let i=SIL_L.length-1;i>=0;i--){ const s=SIL_L[i], st=i?SIL_L[i-1].slice(4,6):[100,7];
+    d+=` C${200-s[2]},${s[3]} ${200-s[0]},${s[1]} ${200-st[0]},${st[1]}`; }
+  return d+" Z";
 }
-function paint(target, items, mirrorWidth){
-  items.forEach(it => {
-    const el = mkShape(it.sh);
-    if(it.deco){ el.setAttribute("class", it.cls||"deco"); }
-    else {
-      const r = REGIONS[it.id]; const sev = sevFor(it.id, it.agg);
-      el.setAttribute("class","region"+(it.joint?" joint":"")+(state.active===it.id?" active":""));
-      el.setAttribute("tabindex","0"); el.setAttribute("role","button");
-      el.setAttribute("aria-label", r.label + (sev!=null?`, marked ${sev} of 10`:""));
-      el.setAttribute("aria-pressed", state.sites[it.id]?"true":"false");
-      if(sev!=null) el.style.fill = heat(sev);
-      const t=document.createElementNS(NS,"title"); t.textContent=r.label; el.appendChild(t);
-      el.addEventListener("click",()=>pick(it.id));
-      el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(it.id);} });
-    }
-    if(it.mir){ const g=document.createElementNS(NS,"g"); g.setAttribute("transform",`matrix(-1 0 0 1 ${mirrorWidth} 0)`); g.appendChild(el); target.appendChild(g); }
-    else target.appendChild(el);
+const SIL = silPath();
+const E = (cx,cy,rx,ry)=>({t:"e",cx,cy,rx,ry});
+
+/* Details drawn over the skin; "both" mirrors to the other side. c: line|hair|eye|tear */
+const FEAT={
+  front:[
+    {sh:P("M80.6,31 C80,14 89,6.2 100,6.2 C111,6.2 120,14 119.4,31 C117,22.5 111.5,16 100,16 C88.5,16 83,22.5 80.6,31 Z"),c:"hair",fill:1},
+    {sh:P("M89.8,27 Q93,25.1 96.2,26.6"),c:"hair",w:1.1,both:1},
+    {sh:E(93.2,31.4,1.45,1.7),c:"eye",fill:1,both:1},
+    {sh:P("M100,31.5 Q98.3,37 99,38.7 Q100,39.5 101.4,38.9"),c:"line",w:.75},
+    {sh:P("M95.6,45 Q100,47.6 104.4,45"),c:"line",w:1},
+    {sh:P("M79.6,29.5 Q81.6,32 80.2,35.5"),c:"line",w:.5,both:1,op:.7},
+    {sh:P("M93.5,57.5 Q100,61 106.5,57.5"),c:"line",w:.6,op:.45},
+    {sh:P("M91,73.5 C85,75.5 77,76.5 69.5,79"),c:"line",w:.7,op:.7,both:1},
+    {sh:P("M78,111 C85,117 93,117.5 99,114.5"),c:"line",w:.6,op:.45,both:1},
+    {sh:P("M100,127 V158"),c:"line",w:.5,op:.3},
+    {sh:E(100,170,1.1,1.7),c:"line",w:.7},
+    {sh:P("M80.5,186 C86,195 92,203 97.5,209.5"),c:"line",w:.5,op:.35,both:1},
+    {sh:E(85.6,294,5,6.5),c:"line",w:.6,op:.45,both:1},
+    {sh:P("M53.5,155 Q57,157 61.5,155"),c:"line",w:.5,op:.5,both:1},
+    {sh:P("M46.6,204.5 Q51,206 55.8,204.5"),c:"line",w:.45,op:.6,both:1},
+  ],
+  back:[
+    {sh:P("M80.4,33 C80,14 89,6.2 100,6.2 C111,6.2 120,14 119.6,33 C118.5,44 111,49.5 100,49.5 C89,49.5 81.5,44 80.4,33 Z"),c:"hair",fill:1},
+    {sh:P("M100,62 V178"),c:"line",w:.6,op:.45},
+    {sh:P("M80,86 C85,94 89,104 87,116"),c:"line",w:.6,op:.5,both:1},
+    {sh:P("M100,184 V214"),c:"line",w:.6,op:.5},
+    {sh:P("M73,211 C81,216 91,216.5 99.5,213"),c:"line",w:.6,op:.55,both:1},
+    {sh:P("M78.5,292 Q86,295.5 93.5,292"),c:"line",w:.6,op:.5,both:1},
+    {sh:P("M79,318 C83,326 85,336 85,346"),c:"line",w:.5,op:.35,both:1},
+    {sh:P("M51,153 Q54.5,150.5 58.5,153"),c:"line",w:.5,op:.5,both:1},
+  ]
+};
+
+function shapeStr(sh, attrs, mirW, inner){
+  const tf = (mirW?`matrix(-1 0 0 1 ${mirW} 0)`:"") + (sh.tf?(mirW?" ":"")+sh.tf:"");
+  const t = tf ? ` transform="${tf}"` : "";
+  const close = inner ? `>${inner}</` : "/>";
+  if(sh.t==="p") return `<path d="${sh.d}"${t} ${attrs}${inner?`>${inner}</path>`:"/>"}`;
+  if(sh.t==="r") return `<rect x="${sh.x}" y="${sh.y}" width="${sh.w}" height="${sh.h}" rx="${sh.rx}"${t} ${attrs}${inner?`>${inner}</rect>`:"/>"}`;
+  if(sh.t==="e") return `<ellipse cx="${sh.cx}" cy="${sh.cy}" rx="${sh.rx}" ry="${sh.ry}"${t} ${attrs}${inner?`>${inner}</ellipse>`:"/>"}`;
+  return `<circle cx="${sh.cx}" cy="${sh.cy}" r="${sh.r}"${t} ${attrs}${inner?`>${inner}</circle>`:"/>"}`;
+}
+const esc = t => String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+
+/* Build one figure as an SVG string. Used for the screen (interactive) and for the PDF (static). */
+function figureSVG({skin, regions, feats, W, viewBox, sw, key, pdf}){
+  const T=tone(); const clip=`clip-${key}`;
+  const skinShapes = skin.map(s=>shapeStr(s.sh, "", s.mir?W:0)).join("");
+  let out = `<defs><clipPath id="${clip}">${skinShapes}</clipPath></defs>`;
+  out += `<g fill="${T.line}" stroke="${T.line}" stroke-width="${sw*2.2}" stroke-linejoin="round">${skinShapes}</g>`;
+  out += `<g fill="${T.fill}">${skinShapes}</g>`;
+  if(skin[0].shade) out += `<g clip-path="url(#${clip})" fill="none" stroke="${T.line}" stroke-width="${sw*6}" opacity=".16">${shapeStr(skin[0].sh,"")}</g>`;
+  const reg = (it)=>{
+    const sev=sevFor(it.id,it.agg), marked=sev!=null, r=REGIONS[it.id];
+    let a = marked ? `fill="${heat(sev)}" fill-opacity="${it.joint?1:.82}" stroke="#FFFFFF" stroke-width="${sw*(it.joint?1.4:.9)}"`
+                   : (it.joint ? `fill="#FFFFFF" fill-opacity=".95" stroke="#2B2B2B" stroke-width="${sw*1.3}"` : `fill="transparent"`);
+    if(pdf) return shapeStr(it.sh, a, it.mir?W:0);
+    a += ` class="region${it.joint?" joint":""}${marked?" marked":""}${state.active===it.id?" active":""}" data-id="${it.id}" tabindex="0" role="button" aria-pressed="${state.sites[it.id]?"true":"false"}" aria-label="${esc(r.label+(marked?`, marked ${sev} of 10`:""))}"`;
+    return shapeStr(it.sh, a, it.mir?W:0, `<title>${esc(r.label)}</title>`);
+  };
+  out += `<g clip-path="url(#${clip})">${regions.filter(it=>!it.joint).map(reg).join("")}</g>`;
+  const col = c => c==="hair"?T.hair : c==="eye"?"#15100C" : c==="nail"?"#FFFFFF" : T.line;
+  out += `<g pointer-events="none">${feats.map(f=>{
+    const a = f.fill ? `fill="${col(f.c)}"${f.c==="nail"?` fill-opacity=".38" stroke="${T.line}" stroke-width="${sw*.5}"`:""}` : `fill="none" stroke="${col(f.c)}" stroke-width="${(f.w||1)*sw/0.6*0.6}" stroke-linecap="round" opacity="${f.op||1}"`;
+    return shapeStr(f.sh, a, f.mir?W:0) + (f.both ? shapeStr(f.sh, a, W) : "");
+  }).join("")}</g>`;
+  out += regions.filter(it=>it.joint).map(reg).join("");
+  return pdf ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${out}</svg>` : out;
+}
+function bodySVG(view, pdf){
+  const items = VIEWS[view];
+  const ears = [{sh:E(80.4,32,3.3,6.2)},{sh:E(80.4,32,3.3,6.2),mir:1}];
+  const extra = items.filter(it=>/^(hand|foot)-/.test(it.id));
+  return figureSVG({skin:[{sh:P(SIL),shade:1},...ears,...extra], regions:items, feats:FEAT[view], W:200, viewBox:"34 2 132 414", sw:.6, key:"b-"+view+(pdf?"-p":""), pdf});
+}
+function detailSVG(grp, s, pdf){
+  const all=(grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
+  const regions=all.filter(it=>!it.deco), feats=all.filter(it=>it.deco).map(it=>({sh:it.sh,c:it.cls==="nail"?"nail":"line",fill:it.cls==="nail",w:it.cls==="crease"?1.2:1,op:it.cls==="crease"?.55:1,mir:it.mir}));
+  return figureSVG({skin:regions.filter(it=>!it.joint), regions, feats, W:170, viewBox:"0 0 170 212", sw:1.2, key:"d-"+grp+s+(pdf?"-p":""), pdf});
+}
+function wire(root){
+  root.querySelectorAll("[data-id]").forEach(el=>{
+    const id=el.getAttribute("data-id");
+    el.addEventListener("click",()=>pick(id));
+    el.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(id);} });
   });
 }
 function drawBody(){
-  svg.textContent = "";
-  // ears and soft landmarks sit under / over the clickable regions
-  paint(svg, [{deco:true,cls:"deco solid",sh:{t:"c",cx:80.5,cy:33,r:4}},{deco:true,cls:"deco solid",sh:{t:"c",cx:119.5,cy:33,r:4}}], 200);
-  paint(svg, VIEWS[state.view], 200);
-  const marks = state.view==="front"
-    ? [ {sh:P("M90,74 C84,76 78,77 70,80 M110,74 C116,76 122,77 130,80")}, {sh:P("M100,126 V182")}, {sh:{t:"c",cx:100,cy:170,r:1.2}} ]
-    : [ {sh:P("M100,60 V172")}, {sh:P("M82,92 C86,100 88,108 86,116 M118,92 C114,100 112,108 114,116")} ];
-  paint(svg, marks.map(m=>Object.assign({deco:true},m)), 200);
+  svg.innerHTML = bodySVG(state.view);
+  wire(svg);
   $("tag-l").textContent = state.view==="front" ? "Your right" : "Your left";
   $("tag-r").textContent = state.view==="front" ? "Your left" : "Your right";
   $("v-front").setAttribute("aria-pressed", state.view==="front");
   $("v-back").setAttribute("aria-pressed", state.view==="back");
+  drawTones();
 }
 function drawDetail(){
   document.querySelectorAll("[data-zoom]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.zoom===state.detail));
   const box=$("detail-box");
   if(!state.detail){ box.hidden=true; return; }
-  box.hidden=false; dsvg.textContent="";
+  box.hidden=false;
   const [grp,s] = state.detail.split("-");
-  const items = (grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
-  paint(dsvg, items, 170);
+  dsvg.innerHTML = detailSVG(grp,s);
+  wire(dsvg);
   $("detail-cap").textContent = grp==="hand"
-    ? `Your ${SIDEW(s).toLowerCase()} hand, palm up, as you look at it. Circles are knuckles.`
-    : `Your ${SIDEW(s).toLowerCase()} foot from above, as you look down at it. Circles are joints and ankle bones.`;
+    ? `Your ${SIDEW(s).toLowerCase()} hand, palm up, as you look at it. White circles are knuckles.`
+    : `Your ${SIDEW(s).toLowerCase()} foot from above, as you look down at it. White circles are joints and ankle bones.`;
 }
+
+/* Skin color choice (kept in this browser) */
+const TONE_KEY="kmh-tone-v1";
+try{ const t=localStorage.getItem(TONE_KEY); if(t) state.tone=t; }catch(e){}
+function drawTones(){
+  const box=$("tones"); if(box.childElementCount!==TONES.length){ box.textContent="";
+    TONES.forEach((t,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="tone"; b.setAttribute("role","radio");
+      b.setAttribute("aria-label",`Skin color ${i+1} of ${TONES.length}: ${t.name}`); b.title=t.name; b.style.background=t.fill; b.dataset.k=t.k;
+      b.onclick=()=>{ state.tone=t.k; try{ localStorage.setItem(TONE_KEY,t.k); }catch(e){} drawBody(); drawDetail(); say(t.name); };
+      b.onkeydown=e=>{ const d={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key]; if(!d) return; e.preventDefault(); const n=TONES[(i+d+TONES.length)%TONES.length]; state.tone=n.k; try{ localStorage.setItem(TONE_KEY,n.k); }catch(err){} drawBody(); drawDetail(); box.querySelector(`[data-k="${n.k}"]`).focus(); say(n.name); };
+      box.appendChild(b); }); }
+  box.querySelectorAll(".tone").forEach(b=>{ const on=b.dataset.k===tone().k; b.setAttribute("aria-checked",on); b.tabIndex=on?0:-1; });
+}
+
+/* Read aloud (device voice; nothing leaves the device) */
+const SPEAK_KEY="kmh-speak-v1";
+let speakOn = true;
+try{ const v=localStorage.getItem(SPEAK_KEY); if(v!==null) speakOn = v==="1"; }catch(e){}
+const canSpeak = typeof window.speechSynthesis!=="undefined" && typeof window.SpeechSynthesisUtterance!=="undefined";
+function say(text){ if(!speakOn||!canSpeak) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.rate=.9; speechSynthesis.speak(u); }catch(e){} }
+function drawSpeak(){ const b=$("b-speak"); if(!canSpeak){ b.hidden=true; return; } b.setAttribute("aria-pressed",speakOn); b.textContent = speakOn ? "Read aloud: On" : "Read aloud: Off"; }
+$("b-speak").onclick=()=>{ speakOn=!speakOn; try{ localStorage.setItem(SPEAK_KEY,speakOn?"1":"0"); }catch(e){} drawSpeak(); if(speakOn) say("Read aloud is on"); };
+drawSpeak();
 document.querySelectorAll("[data-zoom]").forEach(b=>b.onclick=()=>{ state.detail = state.detail===b.dataset.zoom?null:b.dataset.zoom; drawDetail(); });
 function redraw(){ drawBody(); drawDetail(); drawEditor(); drawSites(); syncHandoff(); }
 function pick(id){
   const r = REGIONS[id];
-  if(state.sites[id]){ delete state.sites[id]; if(state.active===id) state.active=null; }
-  else { state.sites[id] = {severity:5, qualities:[]}; state.active = id; }
+  if(state.sites[id]){ delete state.sites[id]; if(state.active===id) state.active=null; say(r.label+" cleared"); }
+  else { state.sites[id] = {severity:5, qualities:[]}; state.active = id; say(r.label); }
   if(r.group) state.detail = `${r.group}-${r.side}`;
   redraw();
 }
 function focusSite(id){
-  const r = REGIONS[id]; state.active = id;
+  const r = REGIONS[id]; state.active = id; say(r.label);
   if(r.view) state.view = r.view;
   if(r.group) state.detail = `${r.group}-${r.side}`;
   redraw();
 }
+/* Pain faces (original drawings) and picture words */
+const FACES=[[0,"No pain","#A8D79E"],[2,"A little","#D5E39A"],[4,"Some","#F3D27A"],[6,"A lot","#F2A75E"],[8,"Very bad","#E8774E"],[10,"Worst possible","#D9465A"]];
+function faceSVG(n,c){
+  const eyesHappy = n<=2, brow = n>=6;
+  const mouth = {0:"M12,24 Q20,32 28,24",2:"M13,25 Q20,29.5 27,25",4:"M13,26.5 L27,26.5",6:"M13,28.5 Q20,24.5 27,28.5",8:"M12,29.5 Q20,22 28,29.5",10:"M12,30.5 Q20,20 28,30.5 Q20,27 12,30.5 Z"}[n];
+  return `<svg viewBox="0 0 40 40" aria-hidden="true" focusable="false"><circle cx="20" cy="20" r="18" fill="${c}" stroke="#2B2B2B" stroke-width="1.4"/>`+
+    (eyesHappy ? `<path d="M11.5,16 Q14,13 16.5,16 M23.5,16 Q26,13 28.5,16" fill="none" stroke="#2B2B2B" stroke-width="1.8" stroke-linecap="round"/>`
+               : `<circle cx="14" cy="16" r="2" fill="#2B2B2B"/><circle cx="26" cy="16" r="2" fill="#2B2B2B"/>`)+
+    (brow ? `<path d="M10,${n>=8?10.5:11.5} L17,${n>=8?13.5:13} M30,${n>=8?10.5:11.5} L23,${n>=8?13.5:13}" stroke="#2B2B2B" stroke-width="1.8" stroke-linecap="round"/>` : "")+
+    `<path d="${mouth}" fill="${n===10?"#2B2B2B":"none"}" stroke="#2B2B2B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`+
+    (n===10 ? `<path d="M12.5,20 Q11,24 12.5,25.5 Q14,24 12.5,20 Z M27.5,20 Q26,24 27.5,25.5 Q29,24 27.5,20 Z" fill="#2F7FD8"/>` : "")+
+    `</svg>`;
+}
+const QICON={
+  Aching:'<path d="M3 7q2.5-2.5 5 0t5 0 5 0M3 11q2.5-2.5 5 0t5 0 5 0M3 15q2.5-2.5 5 0t5 0 5 0"/>',
+  Sharp:'<path d="M4 18 10 2l6 16"/>',
+  Burning:'<path d="M10 2c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-6 1 1 1.5 2 2 3 .3-3 0-5 1-7z"/>',
+  Throbbing:'<path d="M1 11h4l2-5 3 10 2-5h7"/>',
+  Shooting:'<path d="M11 1 4 11h5l-1 8 8-10h-5z"/>',
+  Tingling:'<path d="M10 2v4M10 14v4M2 10h4M14 10h4M4.5 4.5l2.5 2.5M13 13l2.5 2.5M15.5 4.5 13 7M7 13l-2.5 2.5"/>',
+  Numb:'<path d="M10 2v16M3 6l14 8M17 6 3 14"/><circle cx="10" cy="10" r="2"/>',
+  Cramping:'<path d="M10 10m-1.5 0a1.5 1.5 0 1 1 3 0a3.5 3.5 0 1 1-7 0a5.5 5.5 0 1 1 11 0"/>',
+  Stabbing:'<path d="M10 1v12M6 9l4 4 4-4M3 17h14"/>',
+  Pressure:'<path d="M3 3h14M10 6v8M6.5 10.5 10 14l3.5-3.5M3 17h14"/>',
+  Stiff:'<path d="M4 10h12M4 5v10M16 5v10"/>',
+};
+const qIcon = n => `<svg class="qi" viewBox="0 0 20 20" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${QICON[n]||""}</svg>`;
+
+function setSeverity(n, speak){
+  const site=state.sites[state.active]; if(!site) return;
+  site.severity=n; $("ed-sev").value=n; $("ed-sevn").textContent=n;
+  drawBody(); drawDetail(); drawSites(); syncHandoff(); markFace();
+  if(speak){ const f=FACES.find(x=>x[0]===n); say(`${n} out of 10${f?". "+f[1]:""}`); }
+}
+function markFace(){ const site=state.sites[state.active]; document.querySelectorAll("#faces .face").forEach(b=>b.setAttribute("aria-pressed", !!site && +b.dataset.n===site.severity)); }
 function drawEditor(){
   const ed=$("editor"); const id=state.active; const site=state.sites[id];
   if(!id||!site){ ed.hidden=true; return; }
   ed.hidden=false;
   $("ed-title").textContent = REGIONS[id].label;
   $("ed-sev").value = site.severity; $("ed-sevn").textContent = site.severity;
+  const fbox=$("faces"); if(!fbox.childElementCount){
+    FACES.forEach(([n,word,c])=>{ const b=document.createElement("button"); b.type="button"; b.className="face"; b.dataset.n=n;
+      b.setAttribute("aria-label",`${n} out of 10: ${word}`);
+      b.innerHTML = faceSVG(n,c)+`<span class="fw">${word}</span><span class="fn">${n}</span>`;
+      b.onclick=()=>setSeverity(n,true); fbox.appendChild(b); });
+  }
+  markFace();
   const q=$("ed-q"); q.textContent="";
   QUALITIES.forEach(name=>{
-    const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=name;
+    const b=document.createElement("button"); b.type="button"; b.className="chip"; b.innerHTML=qIcon(name)+`<span>${name}</span>`;
     b.setAttribute("aria-pressed", site.qualities.includes(name));
-    b.onclick=()=>{ const i=site.qualities.indexOf(name); i>=0?site.qualities.splice(i,1):site.qualities.push(name); b.setAttribute("aria-pressed", i<0); drawSites(); syncHandoff(); };
+    b.onclick=()=>{ const i=site.qualities.indexOf(name); i>=0?site.qualities.splice(i,1):site.qualities.push(name); b.setAttribute("aria-pressed", i<0); drawSites(); syncHandoff(); say(i<0?name:name+" removed"); };
     q.appendChild(b);
   });
 }
 $("ed-sev").addEventListener("input",e=>{
   const site=state.sites[state.active]; if(!site) return;
-  site.severity=+e.target.value; $("ed-sevn").textContent=site.severity; drawBody(); drawDetail(); drawSites(); syncHandoff();
+  site.severity=+e.target.value; $("ed-sevn").textContent=site.severity; drawBody(); drawDetail(); drawSites(); syncHandoff(); markFace();
 });
 
 $("v-front").onclick=()=>{ state.view="front"; drawBody(); };
@@ -1154,25 +1330,9 @@ Patient-reported information, prepared with AI assistance. Not a diagnosis or tr
 }
 function hslRgb(h,s,l){ s/=100; l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l), f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1))); return [f(0),f(8),f(4)].map(v=>Math.round(v*255)); }
 function heatRgb(sev){ return hslRgb((42-(sev/10)*67+360)%360, 82, 60-sev*1.5); }
-function shapeStr(sh, attrs){
-  const tf = sh.tf ? ` transform="${sh.tf}"` : "";
-  if(sh.t==="p") return `<path d="${sh.d}"${tf} ${attrs}/>`;
-  if(sh.t==="r") return `<rect x="${sh.x}" y="${sh.y}" width="${sh.w}" height="${sh.h}" rx="${sh.rx}"${tf} ${attrs}/>`;
-  return `<circle cx="${sh.cx}" cy="${sh.cy}" r="${sh.r}"${tf} ${attrs}/>`;
-}
-function itemsSVG(items, mirrorW, viewBox, sw){
-  const body = items.map(it=>{
-    let a;
-    if(it.deco){ if(it.cls!=="crease") return ""; a=`fill="none" stroke="#8C97A8" stroke-width="${sw}" opacity=".5"`; }
-    else { const sev=sevFor(it.id,it.agg); const fill = sev!=null ? `rgb(${heatRgb(sev).join(",")})` : (it.joint?"#FFFFFF":"#E3E7EE"); a=`fill="${fill}" stroke="#7E8AA0" stroke-width="${sw}" stroke-linejoin="round"`; }
-    const s = shapeStr(it.sh, a);
-    return it.mir ? `<g transform="matrix(-1 0 0 1 ${mirrorW} 0)">${s}</g>` : s;
-  }).join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${body}</svg>`;
-}
 function svgToPng(svgStr, w, h){
   return new Promise((res,rej)=>{ const img=new Image();
-    img.onload=()=>{ const c=document.createElement("canvas"); c.width=w; c.height=h; const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h); res(c.toDataURL("image/png")); };
+    img.onload=()=>{ const c=document.createElement("canvas"); c.width=w; c.height=h; const x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h); res(c.toDataURL("image/jpeg",0.9)); };
     img.onerror=()=>rej(new Error("render")); img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svgStr); });
 }
 async function buildPDF(){
@@ -1208,14 +1368,14 @@ async function buildPDF(){
   // Body maps + marked areas
   H("Where it hurts");
   const imgW=118, imgH=Math.round(imgW*414/132), top=y+12;
-  const scale=4;
+  const scale=3;
   for(const [i,view] of [[0,"front"],[1,"back"]]){
-    const png = await svgToPng(itemsSVG(VIEWS[view],200,"34 2 132 414",.6), imgW*scale, imgH*scale);
+    const png = await svgToPng(bodySVG(view,true), imgW*scale, imgH*scale);
     const x = M + i*(imgW+12);
     doc.setFont("helvetica","bold"); doc.setFontSize(8); muted();
     doc.text(view==="front"?"FRONT":"BACK", x+imgW/2, top-4, {align:"center"});
     doc.setFont("helvetica","normal"); doc.text(view==="front"?"R":"L", x+2, top+8); doc.text(view==="front"?"L":"R", x+imgW-6, top+8);
-    doc.addImage(png, "PNG", x, top, imgW, imgH);
+    doc.addImage(png, "JPEG", x, top, imgW, imgH);
   }
   const lx = M + 2*imgW + 34, lw = M+W-lx; let ly = top;
   const ids = Object.keys(state.sites).sort((a,b)=>state.sites[b].severity-state.sites[a].severity);
@@ -1237,21 +1397,19 @@ async function buildPDF(){
   if(inColumn){
     for(const [i,g] of groups.entries()){
       const [grp,s]=g.split("-");
-      const items=(grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
-      const png=await svgToPng(itemsSVG(items,170,"0 0 170 212",1.2), cw*scale, ch*scale);
+      const png=await svgToPng(detailSVG(grp,s,true), cw*scale, ch*scale);
       const x=lx+(i%2)*(cw+14), yy=ly+8+Math.floor(i/2)*(ch+18);
-      doc.addImage(png,"PNG",x,yy,cw,ch);
+      doc.addImage(png,"JPEG",x,yy,cw,ch);
       doc.setFont("helvetica","normal"); doc.setFontSize(8); muted();
       doc.text(`${SIDEW(s)} ${grp==="hand"?"hand, palm up":"foot, from above"}`, x+cw/2, yy+ch+10, {align:"center"});
     }
   } else if(groups.length){
-    const rw=86, rh=Math.round(rw*212/170); ensure(rh+26);
+    const rw=74, rh=Math.round(rw*212/170); ensure(rh+26);
     for(const [i,g] of groups.entries()){
       const [grp,s]=g.split("-");
-      const items=(grp==="hand"?handItems(s):footItems(s)).map(it=>Object.assign({},it,{mir:s==="L"}));
-      const png=await svgToPng(itemsSVG(items,170,"0 0 170 212",1.2), rw*scale, rh*scale);
+      const png=await svgToPng(detailSVG(grp,s,true), rw*scale, rh*scale);
       const x=M+i*(rw+40);
-      doc.addImage(png,"PNG",x,y,rw,rh);
+      doc.addImage(png,"JPEG",x,y,rw,rh);
       doc.setFont("helvetica","normal"); doc.setFontSize(8); muted();
       doc.text(`${SIDEW(s)} ${grp==="hand"?"hand, palm up":"foot, from above"}`, x+rw/2, y+rh+10, {align:"center"});
     }
