@@ -1,85 +1,78 @@
-# Know My Health
+# Prior Auth Timestamp Tracker
 
-**Patients tell stories. Doctors want data.** Know My Health translates between the two.
+A free, browser-only dashboard that helps practices (and plans) prove **when each step of a prior authorization happened**, so they can meet compressed PA timeframes and defend every determination.
 
-A patient taps a body map to show where it hurts, then tells what's happening in their own words, typed or spoken. The app turns that into a clinician-ready record they can bring to their visit:
+Built by **Mosaic Life Tech, LLC**.
 
-- **For you:** their story reflected back in plain language
-- **Clinical note:** chief complaint, History of Present Illness, and OPQRST
-- **Story → data:** the patient's own phrases next to their clinical equivalents
-- **Doctor's questions:** the follow-up questions a clinician is likely to ask, which the patient can answer ahead of time
-- **Between visits:** a dated log of episodes, so nothing gets lost between appointments
-- **FHIR R4 record:** a portable Bundle any FHIR-capable system can read
-- **Printable PDF summary** for the patient or a caregiver to hand to the doctor
+## About this app
 
-Built by Teresa Younkin, Mosaic Life Tech.
+This is a simple web app for providers to keep track of their PAs, hold payers to the decision timeframes in effect since January 1, 2026, and get ready for the January 1, 2027 electronic prior authorization requirements. As federal and state prior authorization decision and pend-response windows compress toward seven days, the defensibility of a determination depends on whether an organization can show when each step happened. Pick one recently pended request and reconstruct it below from system records. Any field you cannot fill from the system is where your record breaks down — and where an administrative denial becomes hard to defend.
 
-## Design principles
+## Why
 
-1. **It records. It never diagnoses or recommends treatment.** The model is instructed to document only what the patient reported, flag what wasn't reported, and stop there. It names no conditions, interprets no symptoms, and offers no care advice. The clinical relationship stays with the clinician.
-2. **The patient's voice is preserved.** Their verbatim story travels with the clinical translation, in the app and on the printed summary.
-3. **Clinically specific capture.** The body map goes down to individual fingers, toes, and joints (MCP, PIP, DIP, MTP, CMC), with laterality and a 0–10 pain score for each area.
-4. **Interoperable output.** The FHIR Bundle has one Observation per marked area (SNOMED CT body site, LOINC 72514-3 pain severity, a laterality component) plus the history as a DocumentReference (LOINC 10164-2).
-5. **Safe by construction.** The API key never reaches the browser. The server builds the prompt itself, so the endpoint can't be used as a general-purpose AI proxy. Nothing the patient types is logged or stored on the server.
+Under the CMS Interoperability and Prior Authorization Final Rule (CMS-0057-F), impacted payers must, since January 1, 2026, decide standard requests within 7 calendar days and expedited requests within 72 hours. These timeframes cover items and services; drugs are excluded. They must also give specific denial reasons, publicly report PA metrics, and stand up FHIR-based Prior Authorization APIs by **January 1, 2027**. Providers face a new Electronic Prior Authorization measure in Promoting Interoperability starting with the CY 2027 performance period. Many states set even shorter windows.
 
-## How it works
+A determination is only as defensible as the organization's ability to show when each step happened. This app tracks five timestamps for every PA:
 
-```
-index.html            The whole app: body map, story, results, log, PDF, FHIR (no build step)
-api/translate.js      Serverless function: validates input, builds the prompt, calls Claude, returns JSON
-```
+1. Request received / submitted
+2. Information requested (RFI)
+3. Response received / sent
+4. Decision made
+5. Notice sent / received
 
-The browser sends only the story text, the selected body areas, and whether to include the sample record. `api/translate.js` checks the request's origin, applies rate limits, builds the prompt server-side, and calls the Anthropic Messages API with your key.
+## Features
 
-The between-visit log is stored only in the patient's own browser (localStorage). The PDF is generated in the browser with jsPDF.
+| View | What it does |
+|---|---|
+| **Dashboard** | Open PAs, at-risk and overdue counts, RFI responses due within 48 hours, on-time rate, average turnaround, timestamp completeness score, administrative denials, a deadline-sorted action queue, and a list of timestamp gaps |
+| **PA log** | Search and filter every case; export to CSV |
+| **Case editor** | The five timestamps, each with its system of record, source (system vs. manual/reconstructed), owner and detail. Shows the applied timeframe (plus any payer extension), due time, RFI due time and reconciliation status. The **audit trail** requires a reason whenever a saved timestamp changes |
+| **Audit sheet** | A printable five-timestamp sheet for any case, with an automatic reconciliation check, gap and closure code. Use it for monthly timestamp audits |
+| **Denials & appeals** | Specific denial reason, closure code (clinical vs. administrative), peer-to-peer date, appeal deadline countdown and appeal status |
+| **Scorecard** | Approval, denial, on-time, turnaround, RFI rate, administrative denials, overturns and timestamp gaps, grouped by payer, program, owner or service |
+| **ePA readiness** | A 24-item checklist covering timestamp capture, payer rules, Da Vinci CRD/DTR/PAS and the 2027 ePA milestones, denials and governance |
+| **Settings** | Editable timeframes by program (standard, expedited, payer RFI window, appeal window), your name for the audit trail, JSON backup/restore, CSV import/export and sample data |
 
-## Deploy (about 15 minutes)
+A **Provider / Payer** toggle switches the event wording and dashboard framing between the two perspectives.
 
-### 1. Put the code on GitHub
-Create a new repository named `know-my-health` on github.com and upload these files (drag and drop works). Leave `.env.example` as a template; never commit a real key.
+## Privacy
 
-### 2. Get an Anthropic API key and cap spending
-1. Sign in at [console.anthropic.com](https://console.anthropic.com) and create an API key.
-2. Under **Billing → Limits**, set a monthly spend limit (for example $10). This is the hard backstop for a public demo.
+- There is no server, no login and no analytics. Data is saved only in the browser's `localStorage` on the computer where it was entered.
+- Use internal case numbers, **not patient names or member IDs**.
+- Export a JSON backup regularly. Clearing browser data erases the workspace.
+- For multi-user, shared or PHI-bearing use, host it behind your organization's controls or move to a backend that has a BAA.
 
-### 3. Deploy on Vercel
-1. Sign in at [vercel.com](https://vercel.com) with GitHub and choose **Add New → Project**, then import `know-my-health`.
-2. Framework preset: **Other**. No build command is needed.
-3. Under **Environment Variables**, add:
+## Timeframes: confirm before relying on them
 
-| Name | Value | Required |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | your key | Yes |
-| `ALLOWED_ORIGINS` | your site URL(s), comma-separated, e.g. `https://know-my-health.vercel.app,https://demo.mosaiclifetech.com` | Recommended |
-| `MODEL` | defaults to `claude-haiku-4-5`; any current Claude model ID from the [models page](https://docs.claude.com/en/docs/about-claude/models) | No |
-| `RATE_PER_HOUR` | translations per visitor per hour (default 8) | No |
-| `DAILY_CAP` | translations per day per server instance (default 300) | No |
+Default rules are federal baselines as understood in 2026 and are editable in **Settings**:
 
-4. Click **Deploy**. Every later push to GitHub redeploys automatically.
+| Program | Standard | Expedited | Basis |
+|---|---|---|---|
+| Medicare Advantage, Medicaid FFS & managed care, CHIP FFS & managed care | 7 calendar days | 72 hours | CMS-0057-F |
+| Medicare Advantage – Part B drugs | 72 hours | 24 hours | Drugs are excluded from CMS-0057-F; MA Part B drug rules — verify |
+| QHP on federally-facilitated exchanges, commercial | 15 days | 72 hours | ERISA/ACA baseline; states vary |
 
-### 4. Optional: use your own domain
-In Vercel, open **Project → Settings → Domains** and add, for example, `demo.mosaiclifetech.com`. Vercel shows the DNS record to add at your domain registrar. Add the new address to `ALLOWED_ORIGINS`, then redeploy.
+No federal rule sets how long a provider has to answer an RFI, so the payer RFI window (default 7 days) is a placeholder. Appeal windows vary by program and state (Medicaid fair hearing windows can run up to 90 days). Payers may extend standard decisions in limited cases; record any extension on the case. **Confirm every row for your state and programs.** This tool is an operational aid, not legal advice.
 
-## Cost
+## Deploy on GitHub Pages
 
-Each translation is one request: a short system prompt, the story, and a capped response (1,500 tokens maximum). On the default fast model, that's typically about a cent or less. The per-visitor rate limit, the daily cap, and your Anthropic spend limit keep a public demo predictable.
+1. Create a new repository (for example `pa-timestamp-tracker`) and upload these files to the root: `index.html`, `app.js`, `styles.css`, `README.md`, `.nojekyll`.
+2. Go to **Settings → Pages**, set **Source** to *Deploy from a branch*, and choose `main` / `(root)`.
+3. The site will be published at `https://<your-username>.github.io/pa-timestamp-tracker/`.
 
-## Privacy and safety notes
+To run it locally, open `index.html` in any modern browser. There is no build step and there are no dependencies.
 
-- This is a demonstration, not a medical device, and it is **not HIPAA-compliant**. The page tells visitors not to rely on it for medical decisions. You may also want to ask them not to enter identifying information.
-- Story text passes through Vercel and the Anthropic API to produce the translation. The function writes no request content to logs.
-- The sample health record is fictional and lives on the server, so a visitor can't substitute their own.
-- SNOMED CT and LOINC codes are illustrative and should be validated before any clinical use.
-- Rate limits are kept in memory and reset when the function restarts. For stricter limits, add a store such as Vercel KV or Upstash Redis.
+## CSV import
 
-## Local development
+The import accepts the same columns the app exports (`ref`, `payer`, `program`, …, `event1_ts`, `event1_system`, `event1_source`, …). Map an EHR or portal report to those headers to bulk-load cases. A row whose `ref` already exists updates that case.
 
-```bash
-npm i -g vercel
-cp .env.example .env.local   # add your key
-vercel dev                   # serves index.html and /api/translate at http://localhost:3000
-```
+## Roadmap ideas
 
-## Also runs inside Claude
+- FHIR / Da Vinci PAS import (ClaimResponse timestamps) to remove manual entry
+- Shared team workspace with authentication and role-based access
+- State rule packs (pre-filled windows by state)
+- Email/Teams alerts for at-risk cases
+- Medical-benefit vs. pharmacy-benefit drug handling: a benefit field on each case, Part D / Medicaid pharmacy / PBM timeframes, NCPDP ePA channel and pharmacy step wording, and drug cases separated from the payer scorecard
 
-The same `index.html` works as a Claude artifact. There it uses the viewer's own Claude account instead of `/api/translate`, and falls back to a worked example when Claude isn't available.
+---
+© Mosaic Life Tech, LLC. Operational and compliance-tracking aid only; not legal advice.
